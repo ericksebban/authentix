@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Authentix — Certifiez l'existence de vos créations sur la blockchain Bitcoin. Simple, immédiat, reconnu en justice.">
+<title>Authentix — Certifiez. Protégez. Prouvez.</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg:      #f8f9fb;
+  --bg2:     #eef0f5;
+  --bg3:     #e4e7ef;
+  --ink:     #0a0c10;
+  --ink2:    #2a2d35;
+  --muted:   #6b7080;
+  --muted2:  #9ba3b5;
+  --green:   #00b86b;
+  --green2:  #009958;
+  --green-bg:#e6f9f1;
+  --blue:    #0057ff;
+  --blue-bg: #e8efff;
+  --border:  rgba(10,12,16,0.09);
+  --border2: rgba(10,12,16,0.16);
+  --white:   #ffffff;
+  --dark:    #0d1117;
+  --dark2:   #161b24;
+  --dark3:   #1e2530;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp   { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes blink    { 0%,100%{opacity:1} 50%{opacity:0.3} }
+@keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(400%)} }
+
+.au { animation: fadeUp 0.6s ease both; }
+.au2 { animation: fadeUp 0.6s ease 0.12s both; }
+.au3 { animation: fadeUp 0.6s ease 0.24s both; }
+.au4 { animation: fadeUp 0.6s ease 0.36s both; }
+
+/* ── NAV ── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.9rem 2rem;
+  background: rgba(248,249,251,0.88);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.25rem; font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink); text-decoration: none;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.nav-logo-mark {
+  width: 28px; height: 28px;
+  background: var(--ink);
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.nav-logo-mark svg { width: 14px; height: 14px; }
+
+.nav-center { display: flex; gap: 1.75rem; }
+.nav-center a { font-size: 13px; color: var(--muted); text-decoration: none; font-weight: 500; transition: color 0.15s; }
+.nav-center a:hover { color: var(--ink); }
+
+.nav-right { display: flex; align-items: center; gap: 0.75rem; }
+
+.btn-ghost {
+  padding: 0.5rem 1rem;
+  font-size: 13px; font-weight: 500;
+  color: var(--ink2); text-decoration: none;
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  transition: all 0.15s;
+  background: var(--white);
+}
+.btn-ghost:hover { border-color: var(--ink); }
+
+.btn-dark {
+  padding: 0.5rem 1.1rem;
+  font-size: 13px; font-weight: 500;
+  color: #fff; text-decoration: none;
+  background: var(--ink);
+  border-radius: 8px;
+  transition: background 0.15s;
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--ink);
+}
+.btn-dark:hover { background: var(--ink2); }
+
+/* ── HERO (plein écran, fond sombre) ── */
+.hero {
+  background: var(--dark);
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+}
+
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none;
+}
+
+.hero-glow {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0,184,107,0.15) 0%, transparent 70%);
+  top: -100px; right: -100px;
+  pointer-events: none;
+}
+
+.hero-inner {
+  flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 6rem 2rem 4rem;
+  max-width: 1100px; margin: 0 auto; width: 100%;
+  position: relative;
+  gap: 0;
+}
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,184,107,0.1);
+  border: 1px solid rgba(0,184,107,0.25);
+  border-radius: 99px;
+  padding: 5px 14px;
+  font-size: 12px; font-weight: 500;
+  color: var(--green);
+  margin-bottom: 2rem;
+  width: fit-content;
+}
+
+.hero-tag .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); animation: blink 2s infinite; }
+
+.hero h1 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(2.4rem, 5.5vw, 4.2rem);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: #fff;
+  max-width: 780px;
+  margin-bottom: 1.5rem;
+}
+
+.hero h1 .accent { color: var(--green); }
+
+.hero-sub {
+  font-size: 1.05rem;
+  color: rgba(255,255,255,0.88);
+  max-width: 480px;
+  line-height: 1.75;
+  margin-bottom: 2.5rem;
+}
+
+.hero-actions { display: flex; align-items: center; gap: 0.85rem; flex-wrap: wrap; margin-bottom: 3rem; }
+
+.btn-green {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0.8rem 1.6rem;
+  background: var(--green);
+  color: #fff; font-size: 14px; font-weight: 500;
+  text-decoration: none; border-radius: 8px;
+  transition: all 0.15s;
+  border: 1px solid var(--green);
+}
+.btn-green:hover { background: var(--green2); transform: translateY(-1px); }
+
+.btn-outline-white {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0.8rem 1.6rem;
+  background: transparent;
+  color: rgba(255,255,255,0.7); font-size: 14px; font-weight: 500;
+  text-decoration: none; border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.15);
+  transition: all 0.15s;
+}
+.btn-outline-white:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+
+.hero-pills {
+  display: flex; gap: 0.75rem; flex-wrap: wrap;
+}
+
+.hero-pill {
+  display: flex; align-items: center; gap: 7px;
+  font-size: 14px; color: rgba(255,255,255,0.88);
+  font-weight: 500;
+}
+
+.hero-pill svg { color: var(--green); flex-shrink: 0; }
+
+/* ── CERT CARD (dans hero problème) ── */
+.cert-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  width: 300px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+}
+
+.cert-card-header {
+  background: var(--ink);
+  padding: 0.85rem 1rem;
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+
+.cert-card-header-left h4 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 12px; font-weight: 700; color: #fff; letter-spacing: 0.04em; text-transform: uppercase; }
+.cert-card-header-left p { font-size: 10px; color: rgba(255,255,255,0.4); font-family: 'JetBrains Mono', monospace; margin-top: 2px; }
+
+.cert-status-badge {
+  display: flex; align-items: center; gap: 4px;
+  background: rgba(0,184,107,0.15);
+  border: 1px solid rgba(0,184,107,0.3);
+  border-radius: 99px; padding: 2px 8px;
+  font-size: 10px; font-weight: 500; color: var(--green);
+}
+
+.cert-card-body { padding: 0.85rem 1rem; }
+
+.cert-row { display: flex; gap: 0.5rem; padding: 5px 0; border-bottom: 1px solid var(--border); }
+.cert-row:last-child { border-bottom: none; }
+.cert-key { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted2); min-width: 65px; padding-top: 1px; }
+.cert-val { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--ink2); flex: 1; word-break: break-all; line-height: 1.5; }
+.cert-val.ok { color: var(--green); font-family: 'Inter', sans-serif; font-weight: 500; font-size: 11px; }
+
+/* ── SECTION WRAPPER ── */
+.section { padding: 5rem 2rem; }
+.section-inner { max-width: 1100px; margin: 0 auto; }
+
+.tag {
+  display: inline-block;
+  font-size: 12px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--green2);
+  margin-bottom: 0.75rem;
+}
+
+.h2 {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: clamp(2.2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  margin-bottom: 0.85rem;
+}
+
+.h2 em { font-style: italic; color: var(--green2); font-family: 'Inter', sans-serif; font-weight: 300; }
+
+.sub {
+  font-size: 15px; color: var(--muted);
+  line-height: 1.75; max-width: 520px;
+  margin-bottom: 2.5rem;
+}
+
+/* ── PROBLÈME ── */
+.problem-section { background: var(--dark); }
+
+.problem-layout {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 4rem;
+  align-items: start;
+}
+
+.problem-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 2rem;
+}
+
+.prob-card {
+  background: var(--dark2);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 10px;
+  padding: 1.1rem;
+  transition: border-color 0.15s;
+}
+.prob-card:hover { border-color: rgba(0,184,107,0.3); }
+.prob-card .ico { font-size: 1.2rem; margin-bottom: 0.5rem; }
+.prob-card h4 { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 0.3rem; }
+.prob-card p { font-size: 12px; color: rgba(255,255,255,0.78); line-height: 1.55; }
+
+.prob-tag { color: #8ab89a; }
+.prob-title { color: #fff; }
+.prob-sub { color: rgba(255,255,255,0.88); }
+
+/* ── ÉTAPES ── */
+.steps-section { background: var(--bg); }
+
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.step-cell {
+  background: var(--white);
+  padding: 1.75rem 1.5rem;
+  position: relative;
+}
+
+.step-num-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.step-cell h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+.step-cell p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+.step-cell::after {
+  content: '→';
+  position: absolute; right: -10px; top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted2); font-size: 1.1rem;
+  z-index: 1;
+  background: var(--white);
+  padding: 2px 0;
+}
+.step-cell:last-child::after { display: none; }
+
+.privacy-bar {
+  margin-top: 1rem;
+  background: var(--dark);
+  border-radius: 10px;
+  padding: 1rem 1.5rem;
+  display: flex; align-items: center; gap: 1rem;
+}
+.privacy-bar p { font-size: 13px; color: rgba(255,255,255,0.85); line-height: 1.6; }
+.privacy-bar strong { color: #ffffff; font-weight: 600; }
+
+/* ── CAS D'USAGE ── */
+.usage-section { background: var(--bg2); }
+
+.usage-tabs {
+  display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 2rem;
+}
+
+.utab {
+  padding: 0.45rem 1rem;
+  font-size: 13px; font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid var(--border2);
+  background: var(--white);
+  color: var(--muted);
+  transition: all 0.15s;
+  font-family: 'Inter', sans-serif;
+}
+.utab.active { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.usage-panels > div { display: none; }
+.usage-panels > div.active { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 0.85rem; }
+
+.uc {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  transition: all 0.15s;
+}
+.uc:hover { border-color: var(--green); transform: translateY(-2px); }
+.uc .ico { font-size: 1.1rem; margin-bottom: 0.5rem; }
+.uc h4 { font-size: 13px; font-weight: 600; margin-bottom: 0.3rem; }
+.uc p { font-size: 12px; color: var(--muted); line-height: 1.55; }
+
+/* ── FORCE PROBANTE ── */
+.legal-section { background: var(--bg); }
+
+.legal-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.legal-cell {
+  background: var(--white);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.legal-cell.featured {
+  background: var(--green-bg);
+  border: 2px solid var(--green);
+  margin: -1px;
+  z-index: 1;
+  border-radius: 12px;
+}
+
+.level-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600;
+  padding: 3px 9px; border-radius: 99px;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.04em;
+}
+.l1 { background: #fdeaea; color: #a32d2d; }
+.l2 { background: #d4f7e7; color: #006b3c; }
+.l3 { background: #fff3cd; color: #7a5c08; }
+.l4 { background: var(--bg2); color: var(--muted); }
+
+.legal-cell h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.01em; }
+.legal-cell p { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.legal-cell .eg { font-size: 11px; color: var(--muted2); margin-top: 0.6rem; font-style: italic; }
+.legal-cell.featured p { color: #1a5c38; }
+.legal-cell.featured .eg { color: #2d8c58; }
+
+.legal-note {
+  background: #fff8e0;
+  border: 1px solid #e8c84a;
+  border-radius: 10px;
+  padding: 1.1rem 1.25rem;
+  display: flex; gap: 0.75rem; align-items: flex-start;
+  font-size: 13px; color: #6b4a08;
+  line-height: 1.65;
+}
+
+/* ── TARIFS ── */
+.pricing-section { background: var(--dark); }
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1px;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.pc {
+  background: var(--dark2);
+  padding: 1.75rem 1.5rem;
+  position: relative;
+  transition: background 0.15s;
+}
+.pc:hover { background: var(--dark3); }
+.pc.feat { background: var(--dark3); border: 1px solid rgba(0,184,107,0.3); }
+
+.pc-badge {
+  position: absolute; top: -1px; left: 50%; transform: translateX(-50%);
+  background: var(--green);
+  color: #fff; font-size: 10px; font-weight: 600;
+  padding: 3px 12px; border-radius: 0 0 8px 8px;
+  letter-spacing: 0.05em; white-space: nowrap;
+}
+
+.pc-name { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.35); margin-bottom: 0.75rem; }
+.pc-price { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 2.2rem; font-weight: 800; color: #fff; letter-spacing: -0.04em; line-height: 1; margin-bottom: 0.25rem; }
+.pc-price sub { font-size: 1rem; font-weight: 400; color: rgba(255,255,255,0.4); font-family: 'Inter', sans-serif; vertical-align: baseline; }
+.pc-desc { font-size: 12px; color: rgba(255,255,255,0.72); margin-bottom: 1.25rem; line-height: 1.55; }
+
+.pc-features { list-style: none; margin-bottom: 1.5rem; }
+.pc-features li { display: flex; align-items: flex-start; gap: 7px; font-size: 12px; color: rgba(255,255,255,0.78); padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.pc-features li:last-child { border-bottom: none; }
+.pc-features li::before { content: '✓'; color: var(--green); flex-shrink: 0; font-weight: 600; }
+.pc.feat .pc-features li { color: rgba(255,255,255,0.9); }
+
+.pc-cta {
+  display: block; text-align: center;
+  padding: 0.6rem;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 500;
+  text-decoration: none;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6);
+  transition: all 0.15s;
+}
+.pc-cta:hover { border-color: rgba(255,255,255,0.4); color: #fff; }
+.pc-cta.g { background: var(--green); border-color: var(--green); color: #fff; }
+.pc-cta.g:hover { background: var(--green2); }
+
+.pricing-note { font-size: 12px; color: rgba(255,255,255,0.25); text-align: center; }
+
+/* ── FAQ ── */
+.faq-section { background: var(--bg); }
+.faq-wrap { max-width: 680px; margin: 0 auto; }
+
+.faq-i { border-bottom: 1px solid var(--border); }
+.faq-q {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.1rem 0; cursor: pointer;
+  font-size: 14px; font-weight: 500; gap: 1rem;
+  transition: color 0.15s; user-select: none;
+}
+.faq-q:hover { color: var(--green2); }
+.faq-ic { flex-shrink: 0; transition: transform 0.2s; color: var(--muted); }
+.faq-i.open .faq-ic { transform: rotate(45deg); }
+.faq-a { display: none; padding: 0 0 1.1rem; font-size: 13px; color: var(--muted); line-height: 1.75; }
+.faq-i.open .faq-a { display: block; }
+
+/* ── CTA FINAL ── */
+.cta-section {
+  background: var(--green);
+  padding: 5rem 2rem;
+  text-align: center;
+}
+
+.cta-section .h2 { color: #fff; font-size: clamp(1.8rem, 3.5vw, 2.8rem); }
+.cta-section .sub { color: rgba(255,255,255,0.7); margin: 0 auto 2.5rem; }
+
+.btn-white {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 0.9rem 2rem;
+  background: #fff; color: var(--green2);
+  font-size: 14px; font-weight: 600;
+  text-decoration: none; border-radius: 8px;
+  transition: all 0.15s;
+  border: 2px solid #fff;
+}
+.btn-white:hover { background: transparent; color: #fff; }
+
+.cta-pills { margin-top: 1.5rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+.cta-pill { font-size: 12px; color: rgba(255,255,255,0.6); display: flex; align-items: center; gap: 6px; }
+.cta-pill::before { content: '✓'; font-weight: 700; color: rgba(255,255,255,0.9); }
+
+/* ── FOOTER ── */
+footer {
+  background: var(--dark); color: rgba(255,255,255,0.55);
+  padding: 3rem 2rem;
+}
+.footer-inner { max-width: 1100px; margin: 0 auto; display: flex; justify-content: space-between; gap: 2rem; flex-wrap: wrap; }
+.footer-logo { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+.footer-brand p { font-size: 12px; max-width: 220px; line-height: 1.6; color: rgba(255,255,255,0.55); }
+.footer-col h4 { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.45); margin-bottom: 0.75rem; }
+.footer-col a { display: block; font-size: 13px; color: rgba(255,255,255,0.6); text-decoration: none; margin-bottom: 5px; transition: color 0.15s; }
+.footer-col a:hover { color: rgba(255,255,255,0.8); }
+.footer-bottom { max-width: 1100px; margin: 2rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06); display: flex; justify-content: space-between; font-size: 11px; flex-wrap: wrap; gap: 0.5rem; color: rgba(255,255,255,0.45); }
+
+/* ── JURISPRUDENCE BANNER ── */
+.juris-banner {
+  background: rgba(0,184,107,0.06);
+  border: 1px solid rgba(0,184,107,0.2);
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  display: flex; align-items: center; gap: 0.75rem;
+  margin-top: 2rem;
+  font-size: 13px; color: var(--ink2);
+  line-height: 1.6;
+}
+.juris-banner strong { font-weight: 600; }
+
+/* ── MOBILE ── */
+@media (max-width: 768px) {
+  .nav-center { display: none; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .step-cell::after { display: none; }
+  .legal-grid { grid-template-columns: 1fr; }
+  .legal-cell.featured { margin: 0; }
+  .problem-layout { grid-template-columns: 1fr; }
+  .cert-card { display: none; }
+  .problem-grid { grid-template-columns: 1fr; }
+  .section { padding: 3rem 1.25rem; }
+  .hero-inner { padding: 4rem 1.25rem 3rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <div class="nav-logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    </div>
+    Authentix
+  </a>
+  <div class="nav-center">
+    <a href="#comment">Comment ça marche</a>
+    <a href="#usages">Cas d'usage</a>
+    <a href="#tarifs">Tarifs</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <div class="nav-right">
+    <a href="app.html" class="btn-ghost">Se connecter</a>
+    <a href="app.html" class="btn-dark">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Commencer gratuitement
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+
+    <h1 class="au2">
+      Créateurs, auteurs,<br>
+      entrepreneurs —<br>
+      <span class="accent">protégez vos idées.</span>
+    </h1>
+
+    <p class="hero-sub au3">
+      Votre prochaine création mérite la protection Authentix. Certifiez l'existence de vos fichiers sur la blockchain Bitcoin en 30 secondes. Immuable. Reconnu en justice.
+    </p>
+
+    <div class="hero-tag au3" style="margin-bottom:1.5rem;">
+      <span class="dot"></span>
+      Reconnu par le TJ de Marseille · Mars 2025
+    </div>
+
+    <div class="hero-actions au4">
+      <a href="app.html" class="btn-green">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Essayer gratuitement — 7 certifications offertes
+      </a>
+      <a href="#comment" class="btn-outline-white">Voir comment ça marche</a>
+    </div>
+
+    <div class="hero-pills au4">
+      <div class="hero-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Sans carte bancaire</div>
+      <div class="hero-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Fichier jamais transmis</div>
+      <div class="hero-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Crédits sans expiration</div>
+      <div class="hero-pill"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Ancrage Bitcoin réel</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PROBLÈME -->
+<section class="section problem-section">
+<div class="section-inner">
+  <div class="problem-layout">
+    <div>
+      <span class="tag prob-tag">Le problème</span>
+      <h2 class="h2 prob-title">Chaque jour, des droits légitimes<br>sont perdus <em style="color:#8ab89a;">faute de preuve.</em></h2>
+      <p class="sub prob-sub">Sans preuve datée et inattaquable, votre parole ne compte pas. Un certificat Authentix change tout — comme dans cet exemple.</p>
+
+      <div class="problem-grid">
+        <div class="prob-card"><div class="ico">🎨</div><h4>Création copiée</h4><p>Sans date certifiée, impossible de prouver que vous étiez l'auteur original face à un contrefacteur.</p></div>
+        <div class="prob-card"><div class="ico">🏠</div><h4>État des lieux contesté</h4><p>Propriétaire ou locataire, un litige peut coûter des milliers d'euros. La preuve photographique datée change tout.</p></div>
+        <div class="prob-card"><div class="ico">🚗</div><h4>Location contestée</h4><p>Vous rendez le véhicule en parfait état mais le loueur prétend le contraire. Votre parole contre la sienne.</p></div>
+        <div class="prob-card"><div class="ico">📦</div><h4>Livraison endommagée</h4><p>Sans certificat des dommages pris dans l'heure, le transporteur ne reconnaîtra jamais sa responsabilité.</p></div>
+        <div class="prob-card"><div class="ico">🔨</div><h4>Artisan sans protection</h4><p>Vous intervenez chez un client absent. Sans preuve de l'état avant/après, vous êtes vulnérable à tout.</p></div>
+        <div class="prob-card"><div class="ico">💡</div><h4>Idée présentée, copiée</h4><p>Vous présentez un concept à un partenaire potentiel. Il le développe sans vous. Aucune preuve, aucun recours.</p></div>
+      </div>
+    </div>
+
+    <div style="padding-top:3rem;">
+      <div style="font-size:11px; font-weight:600; letter-spacing:0.08em; text-transform:uppercase; color:rgba(255,255,255,0.6); margin-bottom:0.75rem; text-align:center;">Exemple — problème résolu</div>
+      <div class="cert-card">
+        <div class="cert-card-header">
+          <div class="cert-card-header-left">
+            <h4>Authentix Certificate</h4>
+            <p>CERT-20250118-F3A8C2D1</p>
+          </div>
+          <div class="cert-status-badge">
+            <span style="width:5px;height:5px;border-radius:50%;background:var(--green);animation:blink 2s infinite;display:inline-block;"></span>
+            Bitcoin ✓
+          </div>
+        </div>
+        <div class="cert-card-body">
+          <div class="cert-row"><div class="cert-key">Auteur</div><div class="cert-val">Marie Dupont</div></div>
+          <div class="cert-row"><div class="cert-key">Œuvre</div><div class="cert-val">Collection printemps — illustration série #4</div></div>
+          <div class="cert-row"><div class="cert-key">Date</div><div class="cert-val">18 jan. 2025 · 09:14 UTC</div></div>
+          <div class="cert-row"><div class="cert-key">SHA-256</div><div class="cert-val">a3f8c2d1…4f2a9b8e</div></div>
+          <div class="cert-row"><div class="cert-key">Blockchain</div><div class="cert-val ok">✓ Ancré dans Bitcoin</div></div>
+        </div>
+      </div>
+      <div style="margin-top:0.75rem; font-size:12px; color:rgba(255,255,255,0.7); text-align:center; line-height:1.6;">
+        Marie a présenté ce certificat à son avocat.<br>La procédure a été abandonnée en 48h.
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- COMMENT ÇA MARCHE -->
+<section class="section steps-section" id="comment">
+<div class="section-inner">
+  <span class="tag">La solution</span>
+  <h2 class="h2">4 étapes. 30 secondes.<br><em>Une preuve à vie.</em></h2>
+  <p class="sub">Aucun fichier ne quitte votre appareil. Seule son empreinte numérique unique est ancrée dans Bitcoin.</p>
+
+  <div class="steps-grid">
+    <div class="step-cell">
+      <div class="step-num-badge">01</div>
+      <h3>Déposez votre fichier</h3>
+      <p>Photo, document, vidéo, code — tout format. Glissez-déposez. Votre fichier reste sur votre appareil.</p>
+    </div>
+    <div class="step-cell">
+      <div class="step-num-badge">02</div>
+      <h3>Empreinte calculée</h3>
+      <p>SHA-256 génère une signature numérique unique de votre fichier dans votre navigateur. Infalsifiable.</p>
+    </div>
+    <div class="step-cell">
+      <div class="step-num-badge">03</div>
+      <h3>Ancrage Bitcoin</h3>
+      <p>L'empreinte est inscrite dans la blockchain Bitcoin publique. Immuable, permanente, vérifiable par tous.</p>
+    </div>
+    <div class="step-cell">
+      <div class="step-num-badge">04</div>
+      <h3>Certificat prêt</h3>
+      <p>Téléchargez votre certificat. En cas de litige, la correspondance des empreintes est irréfutable.</p>
+    </div>
+  </div>
+
+  <div class="privacy-bar">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00b86b" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+    <p><strong>Confidentialité totale :</strong> Votre fichier ne nous est jamais transmis. Seule son empreinte cryptographique — mathématiquement irréversible — est envoyée à Bitcoin. Vos œuvres et documents restent entièrement privés, pour toujours.</p>
+  </div>
+
+  <div style="margin-top:1.5rem; text-align:center;">
+    <a href="app.html" class="btn-dark" style="display:inline-flex;">
+      Certifier mon premier fichier gratuitement
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+  </div>
+</div>
+</section>
+
+<!-- CAS D'USAGE -->
+<section class="section usage-section" id="usages">
+<div class="section-inner">
+  <span class="tag">Cas d'usage</span>
+  <h2 class="h2">Pour tous ceux qui ont<br><em>quelque chose à protéger.</em></h2>
+  <p class="sub">Des créateurs aux artisans, des particuliers aux professionnels — Authentix s'adapte à chaque situation.</p>
+
+  <div class="usage-tabs">
+    <button class="utab active" onclick='showU("createurs",this)'>Créateurs</button>
+    <button class="utab" onclick='showU("particuliers",this)'>Particuliers</button>
+    <button class="utab" onclick='showU("pros",this)'>Professionnels</button>
+    <button class="utab" onclick='showU("immo",this)'>Immobilier</button>
+  </div>
+
+  <div class="usage-panels">
+    <div id="up-createurs" class="active">
+      <div class="uc"><div class="ico">🎨</div><h4>Œuvres visuelles</h4><p>Certifiez chaque illustration, design, photo avant publication. Date inattaquable en cas de copie.</p></div>
+      <div class="uc"><div class="ico">✍️</div><h4>Manuscrits et textes</h4><p>Roman, scénario, article, code — prouvez la paternité avant toute dispute.</p></div>
+      <div class="uc"><div class="ico">🎵</div><h4>Musique et compositions</h4><p>Maquettes, partitions, fichiers audio. La priorité temporelle est décisive en cas de plagiat.</p></div>
+      <div class="uc"><div class="ico">💻</div><h4>Code et algorithmes</h4><p>Datez vos innovations avant de les présenter à des partenaires ou investisseurs.</p></div>
+      <div class="uc"><div class="ico">📸</div><h4>Photographie pro</h4><p>Prouvez l'antériorité de vos clichés face aux usages non autorisés sur le web.</p></div>
+      <div class="uc"><div class="ico">🤖</div><h4>Créations IA</h4><p>Certifiez prompts et outputs pour prouver votre contribution créative — enjeu majeur de 2025.</p></div>
+    </div>
+    <div id="up-particuliers">
+      <div class="uc"><div class="ico">🚗</div><h4>Location de véhicule</h4><p>Photos horodatées à la prise et au retour. Impossible d'imputer des dommages préexistants.</p></div>
+      <div class="uc"><div class="ico">📦</div><h4>Colis endommagé</h4><p>Certifiez les dommages dans l'heure. Le transporteur ne peut plus nier sa responsabilité.</p></div>
+      <div class="uc"><div class="ico">🏘️</div><h4>État des lieux</h4><p>Certifiez l'état exact du logement. Fini les litiges de caution arbitraires.</p></div>
+      <div class="uc"><div class="ico">💎</div><h4>Biens de valeur</h4><p>Inventaire certifié pour votre assurance. Preuve irréfutable en cas de vol ou sinistre.</p></div>
+      <div class="uc"><div class="ico">⚡</div><h4>Appareil en panne</h4><p>Prouvez qu'un appareil fonctionnait avant une réparation douteuse ou un sinistre.</p></div>
+      <div class="uc"><div class="ico">🤝</div><h4>Accord verbal</h4><p>Rédigez et certifiez un compte-rendu immédiatement. Date certifiée, valeur probante réelle.</p></div>
+    </div>
+    <div id="up-pros">
+      <div class="uc"><div class="ico">🔧</div><h4>État des lieux artisan</h4><p>Photos avant/après certifiées. Protection totale contre la mauvaise foi des donneurs d'ordre.</p></div>
+      <div class="uc"><div class="ico">🚚</div><h4>Preuve de livraison</h4><p>Certifiez chaque livraison avec photo et heure. Inattaquable en cas de litige.</p></div>
+      <div class="uc"><div class="ico">🏨</div><h4>Conciergerie court séjour</h4><p>État certifié après chaque ménage. Protection du prestataire et du propriétaire.</p></div>
+      <div class="uc"><div class="ico">📋</div><h4>Devis et propositions</h4><p>Certifiez vos propositions avant remise. Si un client copie votre concept, vous avez la preuve.</p></div>
+      <div class="uc"><div class="ico">🏗️</div><h4>Chantiers et travaux</h4><p>PV de réunion, ordres de service, états d'avancement. Réduisez les litiges de fin de chantier.</p></div>
+      <div class="uc"><div class="ico">🔐</div><h4>Secrets d'affaires</h4><p>Procédés, formules, savoir-faire. Preuve d'antériorité essentielle en cas de débauchage.</p></div>
+    </div>
+    <div id="up-immo">
+      <div class="uc"><div class="ico">🏢</div><h4>Livraison VEFA</h4><p>Photos certifiées le jour de livraison. Protection du promoteur et de l'acquéreur.</p></div>
+      <div class="uc"><div class="ico">📐</div><h4>Plans et versions</h4><p>Datez chaque version de plan. Preuve de ce qui a été remis aux acquéreurs.</p></div>
+      <div class="uc"><div class="ico">🔨</div><h4>Réserves et levées</h4><p>Certifiez les réserves et leur levée. Chronologie inattaquable en cas de sinistre ultérieur.</p></div>
+      <div class="uc"><div class="ico">📄</div><h4>Notices descriptives</h4><p>Certifiez les documents remis aux acquéreurs. Évitez les litiges "ce n'est pas ce qu'on m'avait promis".</p></div>
+      <div class="uc"><div class="ico">🏚️</div><h4>Diagnostics</h4><p>Certifiez l'état d'un bien avant signature. Protection acheteur et vendeur contre les vices cachés.</p></div>
+      <div class="uc"><div class="ico">⏱️</div><h4>Permis de construire</h4><p>Certifiez l'affichage à intervalles réguliers. Preuve de conformité légale en cas de recours.</p></div>
+    </div>
+  </div>
+
+  <div style="margin-top:1.75rem; text-align:center;">
+    <a href="app.html" class="btn-dark" style="display:inline-flex;">
+      Créer mon compte et certifier gratuitement
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+    </a>
+  </div>
+</div>
+</section>
+
+<!-- FORCE PROBANTE -->
+<section class="section legal-section">
+<div class="section-inner">
+  <span class="tag">Valeur juridique</span>
+  <h2 class="h2">Quelle force probante<br><em>pour votre certificat ?</em></h2>
+  <p class="sub">Il existe plusieurs niveaux de preuve en droit français. Authentix vous place au bon niveau pour 90% des situations de la vie courante.</p>
+
+  <div class="legal-grid">
+    <div class="legal-cell">
+      <span class="level-badge l1">Niveau 1 — Faible</span>
+      <h3>Métadonnées seules</h3>
+      <p>La date dans les propriétés d'un fichier ou d'une photo. Modifiable en quelques secondes. Aucune valeur probante réelle.</p>
+      <div class="eg">Ex : date EXIF d'une photo non certifiée</div>
+    </div>
+    <div class="legal-cell featured">
+      <span class="level-badge l2">Niveau 2 — Preuve renforcée · Authentix ✓</span>
+      <h3>Ancrage blockchain</h3>
+      <p>Votre empreinte SHA-256 inscrite dans la Blockchain est techniquement infalsifiable. Si besoin, le juge nommera un commissaire pour authentifier la preuve Authentix. C'est immédiat et imparable ! Reconnu par la jurisprudence française depuis mars 2025. Équivalent à l'enveloppe Soleau mais plus simple, rapide et moins cher !</p>
+      <div class="eg">Ex : certification Authentix — suffisant pour 90% des litiges</div>
+    </div>
+    <div class="legal-cell">
+      <span class="level-badge l3">Niveau 3 — Plus coûteux</span>
+      <h3>Blockchain + constat d'huissier</h3>
+      <p>Vous faites authentifier votre certificat Authentix en amont par un commissaire de justice (huissier). C'est exactement le montage utilisé dans l'affaire AZ Factory (TJ Marseille, 2025). Avec ce niveau de protection un litige se résoudra le plus souvent sans besoin d'un juge.</p>
+      <div class="eg">Ex : litige commercial important, procédure judiciaire</div>
+    </div>
+    <div class="legal-cell">
+      <span class="level-badge l4">Niveau 4 — Maximum</span>
+      <h3>Acte notarié / PSC eIDAS</h3>
+      <p>Acte authentique avec présomption légale de date exacte. Nécessaire uniquement pour les actes patrimoniaux majeurs.</p>
+      <div class="eg">Ex : succession, brevet, acte de cession</div>
+    </div>
+  </div>
+
+  <div class="juris-banner">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--green2)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <p><strong>Décision historique :</strong> Le 20 mars 2025, le Tribunal judiciaire de Marseille a reconnu pour la première fois en France la valeur probante d'un ancrage blockchain pour établir l'antériorité et la titularité des droits d'auteur. Authentix utilise la même technologie. En cas de litige sérieux, un commissaire de justice nommé par le juge peut authentifier votre certificat en moins d'une heure.</p>
+  </div>
+</div>
+</section>
+
+<!-- TARIFS -->
+<section class="section pricing-section" id="tarifs">
+<div class="section-inner">
+  <span class="tag" style="color:#8ab89a;">Tarifs</span>
+  <h2 class="h2" style="color:#fff;">Moins cher qu'un café.<br><em style="color:#8ab89a;">Infiniment plus utile.</em></h2>
+  <p class="sub" style="color:rgba(255,255,255,0.78);">Commencez gratuitement. Rechargez quand vous en avez besoin. Crédits sans expiration.</p>
+
+  <div class="pricing-grid">
+    <div class="pc">
+      <div class="pc-name">Découverte</div>
+      <div class="pc-price">0 <sub>€</sub></div>
+      <div class="pc-desc">Pour tester le service et certifier vos premières créations.</div>
+      <ul class="pc-features">
+        <li>7 certifications blockchain offertes</li>
+        <li>Coffre-fort personnel</li>
+        <li>Certificat téléchargeable</li>
+        <li>Vérification publique</li>
+        <li>Sans carte bancaire</li>
+      </ul>
+      <a href="app.html" class="pc-cta g">Démarrer gratuitement</a>
+    </div>
+
+    <div class="pc feat">
+      <div class="pc-badge">LE PLUS CHOISI</div>
+      <div class="pc-name">Pack 5 crédits</div>
+      <div class="pc-price">5,50 <sub>€</sub></div>
+      <div class="pc-desc">1,10 € par certificat <span style="color:rgba(255,255,255,0.3); text-decoration:line-through; font-size:11px;">vs 1,65 € à l'unité</span></div>
+      <ul class="pc-features">
+        <li>5 certifications blockchain</li>
+        <li>1,10 € par certificat</li>
+        <li>Crédits sans expiration</li>
+        <li>Coffre-fort + export CSV</li>
+        <li>Support par email</li>
+      </ul>
+      <a href="app.html" class="pc-cta g">Acheter ce pack</a>
+    </div>
+
+    <div class="pc">
+      <div class="pc-name">Pack 20 crédits</div>
+      <div class="pc-price">12,99 <sub>€</sub></div>
+      <div class="pc-desc">0,65 € par certificat. Meilleur rapport qualité-prix.</div>
+      <ul class="pc-features">
+        <li>20 certifications blockchain</li>
+        <li>0,65 € par certificat</li>
+        <li>Crédits sans expiration</li>
+        <li>Coffre-fort + export CSV</li>
+        <li>Support prioritaire</li>
+      </ul>
+      <a href="app.html" class="pc-cta">Acheter ce pack</a>
+    </div>
+
+    <div class="pc">
+      <div class="pc-name">Pro illimité</div>
+      <div class="pc-price">19,99 <sub>€/mois</sub></div>
+      <div class="pc-desc">Pour les professionnels qui certifient en volume.</div>
+      <ul class="pc-features">
+        <li>Certifications illimitées</li>
+        <li>Partage certifié avec tiers</li>
+        <li>API disponible</li>
+        <li>Facturation mensuelle</li>
+        <li>Support dédié</li>
+      </ul>
+      <a href="app.html" class="pc-cta">Démarrer en Pro</a>
+    </div>
+  </div>
+
+  <p class="pricing-note">Paiement sécurisé par Stripe · Facture immédiate · Les crédits n'expirent jamais · Sans engagement</p>
+</div>
+</section>
+
+<!-- FAQ -->
+<section class="section faq-section" id="faq">
+<div class="section-inner">
+  <span class="tag">FAQ</span>
+  <h2 class="h2" style="text-align:center;">Questions fréquentes</h2>
+  <br>
+  <div class="faq-wrap" id="faqEl"></div>
+</div>
+</section>
+
+<!-- CTA FINAL -->
+<section class="cta-section">
+<div class="section-inner">
+  <h2 class="h2">Votre prochaine création<br>mérite d'être protégée.</h2>
+  <p class="sub">Rejoignez Authentix. 7 certifications offertes, sans carte bancaire, en 30 secondes.</p>
+  <a href="app.html" class="btn-white">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    Créer mon compte gratuitement
+  </a>
+  <div class="cta-pills">
+    <div class="cta-pill">7 certifications offertes</div>
+    <div class="cta-pill">Sans carte bancaire</div>
+    <div class="cta-pill">Fichier jamais transmis</div>
+    <div class="cta-pill">Ancrage Bitcoin réel</div>
+  </div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">Authentix</div>
+      <p>Certification blockchain d'antériorité. Simple, rapide, reconnu en justice.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Service</h4>
+      <a href="#comment">Comment ça marche</a>
+      <a href="#usages">Cas d'usage</a>
+      <a href="#tarifs">Tarifs</a>
+      <a href="app.html">Mon espace</a>
+    </div>
+    <div class="footer-col">
+      <h4>Légal</h4>
+      <a href="#">Mentions légales</a>
+      <a href="#">CGU</a>
+      <a href="#">Politique de confidentialité</a>
+      <a href="#">Politique d'horodatage</a>
+    </div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <a href="/cdn-cgi/l/email-protection#fa9995948e9b998eba9b8f8e929f948e9382d49c88"><span class="__cf_email__" data-cfemail="a2c1cdccd6c3c1d6e2c3d7d6cac7ccd6cbda8cc4d0">[email&#160;protected]</span></a>
+      <a href="#">Signaler un abus</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 Authentix</span>
+    <span>Ancrage Bitcoin via OpenTimestamps · Hébergement EU · RGPD</span>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const FAQS = [
+  {q:"Mon fichier est-il envoyé sur vos serveurs ?", a:"Non, jamais. L'empreinte SHA-256 est calculée directement dans votre navigateur. Seule cette empreinte cryptographique — mathématiquement irréversible — est transmise à Bitcoin. Il est techniquement impossible de reconstituer votre fichier original."},
+  {q:"Qu'est-ce que la blockchain Bitcoin apporte concrètement ?", a:"La blockchain Bitcoin est un registre public, décentralisé et immuable. Une transaction inscrite dans Bitcoin ne peut jamais être modifiée ni effacée — même par nous. Personne ne peut falsifier rétroactivement la date d'ancrage de votre empreinte."},
+  {q:"Quelle est la valeur juridique du certificat Authentix ?", a:"Le 20 mars 2025, le Tribunal judiciaire de Marseille a reconnu la valeur probante d'un ancrage blockchain en matière de droits d'auteur. Votre certificat Authentix constitue une preuve d'antériorité sérieuse, équivalente à l'enveloppe Soleau de l'INPI. Pour les litiges importants, un commissaire de justice peut authentifier votre certificat en quelques heures."},
+  {q:"Dois-je conserver mon fichier original ?", a:"Oui, absolument. Le certificat et le fichier original sont indissociables. Pour prouver votre antériorité, vous devez présenter les deux : le certificat contient l'empreinte, et votre fichier original permet de la vérifier. Conservez-les ensemble dans un endroit sûr."},
+  {q:"Que se passe-t-il si Authentix ferme un jour ?", a:"Rien ne change pour vos preuves. L'ancrage est inscrit dans la blockchain Bitcoin publique — permanent et indépendant de notre service. N'importe qui peut vérifier votre certificat en comparant l'empreinte de votre fichier avec celle inscrite dans Bitcoin, sans passer par Authentix."},
+  {q:"Combien de temps prend la confirmation Bitcoin ?", a:"La soumission est immédiate et votre certificat est émis dans les secondes qui suivent. OpenTimestamps inscrit les hash dans Bitcoin une à deux fois par jour. La confirmation finale prend entre 6 et 24 heures. Votre certificat affiche 'en attente' puis passe à 'confirmé'."},
+  {q:"Les crédits expirent-ils ?", a:"Non, jamais. Vos crédits sont valables indéfiniment. Vous les utilisez à votre rythme, sans aucune pression ni date limite."},
+  {q:"Puis-je certifier plusieurs fichiers en une fois ?", a:"Actuellement, Authentix certifie un fichier à la fois. Pour plusieurs fichiers simultanément, regroupez-les dans un ZIP avant la certification. La certification de dossier complet est sur notre feuille de route."},
+  {q:"Authentix est-il conforme au RGPD ?", a:"Oui. Nous collectons uniquement les données nécessaires : votre email, les empreintes de vos fichiers, les métadonnées des certificats. Vos fichiers originaux ne nous sont jamais transmis. Vous pouvez demander la suppression de votre compte à tout moment. Infrastructure hébergée en Europe."},
+];
+
+const el = document.getElementById('faqEl');
+el.innerHTML = FAQS.map((f,i) => `
+  <div class="faq-i" id="fi${i}">
+    <div class="faq-q" onclick="tFaq(${i})">
+      ${f.q}
+      <svg class="faq-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </div>
+    <div class="faq-a">${f.a}</div>
+  </div>`).join('');
+
+function tFaq(i) {
+  const it = document.getElementById('fi'+i);
+  const open = it.classList.contains('open');
+  document.querySelectorAll('.faq-i').forEach(x=>x.classList.remove('open'));
+  if(!open) it.classList.add('open');
+}
+
+function showU(id, btn) {
+  document.querySelectorAll('.usage-panels > div').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.utab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('up-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click', e=>{
+    const t = document.querySelector(a.getAttribute('href'));
+    if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth',block:'start'}); }
+  });
+});
+
+// Initialisation FAQ au chargement du DOM
+document.addEventListener('DOMContentLoaded', function() {
+  const faqEl = document.getElementById('faqEl');
+  if(faqEl) {
+    faqEl.innerHTML = FAQS.map((f,i) => `
+      <div class="faq-i" id="fi${i}">
+        <div class="faq-q" onclick="tFaq(${i})">
+          ${f.q}
+          <svg class="faq-ic" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+        <div class="faq-a">${f.a}</div>
+      </div>`).join('');
+  }
+});
+</script>
+</body>
+</html>
