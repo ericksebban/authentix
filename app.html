@@ -1020,48 +1020,34 @@ async function handleFile(file) {
 
 // ── Ancrage OpenTimestamps — fetch pur, sans librairie externe ──
 // Envoie le hash SHA-256 directement au serveur de calendrier Bitcoin OTS
-// Ancrage OpenTimestamps — Content-Type: application/octet-stream (requis par l'API)
+// Ancrage OpenTimestamps via proxy Vercel (évite le CORS)
+// Le proxy est sur https://authentix-proxy.vercel.app/api/timestamp
 async function ancrerBitcoin(hashHex) {
-  const CALENDRIERS = [
-    'https://a.pool.opentimestamps.org/digest',
-    'https://b.pool.opentimestamps.org/digest',
-    'https://alice.btc.calendar.opentimestamps.org/digest'
-  ];
+  // URL du proxy — à mettre à jour après déploiement Vercel
+ const PROXY_URL = 'https://authentix-proxy-ericksebban.vercel.app/api/timestamp';
 
-  // Convertit le hash hex en Uint8Array (32 bytes exacts)
-  const hashBytes = new Uint8Array(
-    hashHex.match(/.{1,2}/g).map(b => parseInt(b, 16))
-  );
+  try {
+    const resp = await fetch(PROXY_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hash: hashHex })
+    });
 
-  for (const url of CALENDRIERS) {
-    try {
-      const resp = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/octet-stream' },
-        body: hashBytes.buffer  // Envoyer l'ArrayBuffer sous-jacent
-      });
+    const data = await resp.json();
+    console.log('Proxy OTS →', resp.status, data.ok ? '✓' : '✗', data.server || data.error || '');
 
-      console.log('OTS', url, '→ HTTP', resp.status);
-
-      if (resp.ok) {
-        const buffer = await resp.arrayBuffer();
-        const bytes  = new Uint8Array(buffer);
-        // Un reçu OTS valide fait entre 60 et 300 bytes
-        if (bytes.length > 50) {
-          const b64 = btoa(String.fromCharCode(...bytes));
-          console.log('OTS ancrage confirmé via', url, '— reçu', bytes.length, 'bytes ✓');
-          return { ok: true, receipt: b64, server: url };
-        } else {
-          console.warn('OTS réponse trop courte (' + bytes.length + ' bytes) — rejeté');
-        }
-      }
-    } catch(e) {
-      console.warn('OTS', url, '→', e.message);
+    if (data.ok && data.receipt) {
+      console.log('OTS ancrage soumis ✓ — reçu', data.size, 'bytes via', data.server);
+      return { ok: true, receipt: data.receipt };
     }
-  }
 
-  console.warn('OTS : tous les calendriers ont échoué');
-  return { ok: false, receipt: null };
+    console.warn('Proxy OTS échoué:', data.error);
+    return { ok: false, receipt: null };
+
+  } catch(e) {
+    console.warn('Proxy OTS inaccessible:', e.message);
+    return { ok: false, receipt: null };
+  }
 }
 
 async function doCertify() {
