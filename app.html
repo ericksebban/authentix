@@ -1024,7 +1024,7 @@ async function handleFile(file) {
 // Le proxy est sur https://authentix-proxy.vercel.app/api/timestamp
 async function ancrerBitcoin(hashHex) {
   // URL du proxy — à mettre à jour après déploiement Vercel
- const PROXY_URL = 'https://authentix-proxy-ericksebban.vercel.app/api/timestamp';
+ const PROXY_URL = 'authentix-proxy.vercel.app';
 
   try {
     const resp = await fetch(PROXY_URL, {
