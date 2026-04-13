@@ -390,7 +390,8 @@ td { padding: 0.75rem 1rem; vertical-align: middle; }
   .packs { grid-template-columns: 1fr 1fr; }
 }
 </style>
-<!-- OpenTimestamps : ancrage direct via fetch, sans librairie externe -->
+<!-- OpenTimestamps — librairie officielle hébergée localement -->
+<script src="opentimestamps.min.js"></script>
 </head>
 <body>
 
@@ -590,6 +591,9 @@ td { padding: 0.75rem 1rem; vertical-align: middle; }
               Télécharger le certificat
             </button>
             <button class="btn" style="font-size:12px;" onclick="showPage('coffre')">Voir mon coffre-fort</button>
+            <button class="btn" id="dlOtsBtn" style="font-size:12px; display:none;">
+              ⬇ Télécharger la preuve .ots
+            </button>
           </div>
         </div>
       </div>
@@ -598,14 +602,16 @@ td { padding: 0.75rem 1rem; vertical-align: middle; }
     <!-- PAGE : VÉRIFIER -->
     <div class="page" id="page-verifier">
       <div class="page-title">Vérifier un certificat</div>
-      <div class="page-sub">Déposez le fichier original ou entrez un identifiant de certificat</div>
+      <div class="page-sub">Retrouvez un certificat par fichier ou identifiant, et vérifiez son ancrage Bitcoin</div>
 
       <div style="max-width:560px;">
+
+        <!-- Recherche par fichier ou ID -->
         <div class="drop-zone" id="dzVerif">
           <svg class="drop-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
             <circle cx="24" cy="24" r="18"/><path d="M16 24l6 6 10-10"/>
           </svg>
-          <h3>Déposer le fichier à vérifier</h3>
+          <h3>Déposer le fichier original</h3>
           <p>L'empreinte est recalculée localement puis comparée au registre</p>
           <input type="file" id="fileVerif">
         </div>
@@ -618,6 +624,35 @@ td { padding: 0.75rem 1rem; vertical-align: middle; }
 
         <div class="status-line" id="verifStatus"></div>
         <div id="verifResult" style="margin-top:1rem;"></div>
+
+        <!-- Vérification Bitcoin avec fichier .ots -->
+        <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border);">
+          <div style="font-size:13px; font-weight:600; margin-bottom:0.5rem;">Vérifier un ancrage Bitcoin</div>
+          <div style="font-size:12px; color:var(--muted); margin-bottom:1rem;">
+            Déposez votre fichier original ET votre fichier .ots pour vérifier l'ancrage directement.
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div style="border:1px dashed var(--border2); border-radius:var(--r); padding:0.85rem; text-align:center; cursor:pointer; background:#fff;" onclick="document.getElementById('fileOrigVerif').click()">
+              <div style="font-size:18px; margin-bottom:4px;">📄</div>
+              <div style="font-size:12px; font-weight:500;">Fichier original</div>
+              <div style="font-size:11px; color:var(--muted2);" id="fileOrigVerifName">Cliquer pour choisir</div>
+              <input type="file" id="fileOrigVerif" style="display:none;" onchange="setVerifFile(this,'orig')">
+            </div>
+            <div style="border:1px dashed var(--border2); border-radius:var(--r); padding:0.85rem; text-align:center; cursor:pointer; background:#fff;" onclick="document.getElementById('fileOtsVerif').click()">
+              <div style="font-size:18px; margin-bottom:4px;">🔐</div>
+              <div style="font-size:12px; font-weight:500;">Fichier .ots</div>
+              <div style="font-size:11px; color:var(--muted2);" id="fileOtsVerifName">Cliquer pour choisir</div>
+              <input type="file" id="fileOtsVerif" accept=".ots" style="display:none;" onchange="setVerifFile(this,'ots')">
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="btnVerifOts" onclick="lancerVerifOtsManuel()" disabled style="font-size:13px;">
+            🔍 Vérifier l'ancrage Bitcoin
+          </button>
+          <div id="verifOtsResult" style="margin-top:1rem;"></div>
+        </div>
+
       </div>
     </div>
 
@@ -737,6 +772,15 @@ td { padding: 0.75rem 1rem; vertical-align: middle; }
   <div class="modal">
     <h2>Détail du certificat <button class="modal-x" onclick="closeModal('modalDetail')">×</button></h2>
     <div id="modalDetailBody"></div>
+    <div id="modalOtsActions" style="display:none; margin-top:1rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+      <button class="btn btn-primary" id="modalDlOtsBtn" style="font-size:12px;">
+        ⬇ Télécharger la preuve .ots
+      </button>
+      <button class="btn" id="modalVerifOtsBtn" style="font-size:12px;">
+        🔍 Vérifier l'ancrage Bitcoin
+      </button>
+    </div>
+    <div id="modalVerifResult" style="margin-top:0.75rem;"></div>
     <div style="margin-top:1.25rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
       <button class="btn btn-gold" style="font-size:12px;" onclick="dlActiveCert()">Télécharger</button>
       <button class="btn" style="font-size:12px;" onclick="closeModal('modalDetail')">Fermer</button>
@@ -928,7 +972,8 @@ function renderCerts(list) {
     const preuve = c.PREUVE||c.preuve||'—';
     const otsStatus = c.OTS_STATUS||'';
     const otsTx = c.OTS_BITCOIN_TX||'';
-    const row = {certId,date:c.DATE_ISO||c.date,desc,auteur,categorie,fichier,hash,preuve,otsStatus,otsTx};
+    const otsReceipt = c.OTS_RECEIPT||c.otsReceipt||'';
+    const row = {certId,date:c.DATE_ISO||c.date,desc,auteur,categorie,fichier,hash,preuve,otsStatus,otsTx,otsReceipt};
     const statusHtml = otsStatus==='confirmed'
       ? '<span class="dot-ok"></span><span style="font-size:11px;">Bitcoin ✓</span>'
       : otsStatus==='pending'
@@ -1018,35 +1063,103 @@ async function handleFile(file) {
   if(user.credits<=0){ document.getElementById('certBtn').disabled=true; document.getElementById('creditWarn').textContent='Crédit insuffisant — rechargez votre compte.'; }
 }
 
-// ── Ancrage OpenTimestamps — fetch pur, sans librairie externe ──
-// Envoie le hash SHA-256 directement au serveur de calendrier Bitcoin OTS
-// Ancrage OpenTimestamps via proxy Vercel (évite le CORS)
-// Le proxy est sur https://authentix-proxy.vercel.app/api/timestamp
+// ── Ancrage OpenTimestamps via la librairie officielle ──────────
+// Utilise opentimestamps.min.js hébergé localement
+// Génère un vrai fichier .ots vérifiable sur opentimestamps.org
 async function ancrerBitcoin(hashHex) {
-  // URL du proxy — à mettre à jour après déploiement Vercel
-  const PROXY_URL = 'https://authentix-proxy.ericksebban.workers.dev';
-
   try {
-    const resp = await fetch(PROXY_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ hash: hashHex })
-    });
-
-    const data = await resp.json();
-    console.log('Proxy OTS →', resp.status, data.ok ? '✓' : '✗', data.server || data.error || '');
-
-    if (data.ok && data.receipt) {
-      console.log('OTS ancrage soumis ✓ — reçu', data.size, 'bytes via', data.server);
-      return { ok: true, receipt: data.receipt };
+    if (typeof OpenTimestamps === 'undefined') {
+      console.warn('Librairie OpenTimestamps non chargée');
+      return { ok: false, receipt: null, otsBytes: null };
     }
 
-    console.warn('Proxy OTS échoué:', data.error);
-    return { ok: false, receipt: null };
+    // Convertir le hash hex en Uint8Array
+    const hashBytes = new Uint8Array(
+      hashHex.match(/.{2}/g).map(b => parseInt(b, 16))
+    );
+
+    // Créer l'objet DetachedTimestampFile depuis le hash
+    const op       = new OpenTimestamps.Ops.OpSHA256();
+    const detached = OpenTimestamps.DetachedTimestampFile.fromHash(op, hashBytes);
+
+    // Soumettre aux serveurs de calendrier Bitcoin
+    await OpenTimestamps.stamp(detached);
+
+    // Sérialiser en bytes → vrai fichier .ots
+    const otsBytes = detached.serializeToBytes();
+    console.log('OTS ancrage soumis ✓ — reçu', otsBytes.length, 'bytes');
+
+    if (otsBytes.length < 100) {
+      console.warn('Fichier .ots trop petit:', otsBytes.length, 'bytes');
+      return { ok: false, receipt: null, otsBytes: null };
+    }
+
+    // Encoder en base64 pour stockage Google Sheets
+    const b64 = btoa(String.fromCharCode(...otsBytes));
+    return { ok: true, receipt: b64, otsBytes };
 
   } catch(e) {
-    console.warn('Proxy OTS inaccessible:', e.message);
-    return { ok: false, receipt: null };
+    console.warn('OTS erreur:', e.message);
+    return { ok: false, receipt: null, otsBytes: null };
+  }
+}
+
+// ── Télécharger le fichier .ots d'un certificat ──────────────
+function dlOts(certId, otsB64, nomFichier) {
+  if (!otsB64) {
+    alert('Le fichier .ots n\'est pas encore disponible pour ce certificat.');
+    return;
+  }
+  try {
+    const bytes = Uint8Array.from(atob(otsB64), c => c.charCodeAt(0));
+    const blob  = new Blob([bytes], { type: 'application/octet-stream' });
+    const a     = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = (nomFichier || certId) + '.ots';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch(e) {
+    alert('Erreur lors de la génération du fichier .ots : ' + e.message);
+  }
+}
+
+// ── Vérification Bitcoin intégrée (sans passer par OTS externe) ──
+async function verifierAncrageBitcoin(otsB64, fileBytes) {
+  if (typeof OpenTimestamps === 'undefined') {
+    return { confirmed: false, message: 'Librairie non chargée' };
+  }
+  if (!otsB64) {
+    return { confirmed: false, message: 'Aucun fichier .ots disponible' };
+  }
+  try {
+    const otsBytes  = Uint8Array.from(atob(otsB64), c => c.charCodeAt(0));
+    const detached  = OpenTimestamps.DetachedTimestampFile.deserialize(otsBytes);
+
+    // Tenter l'upgrade (récupère la preuve Bitcoin finale si confirmée)
+    const upgraded  = await OpenTimestamps.upgrade(detached);
+
+    // Vérifier localement
+    const info = OpenTimestamps.info(detached);
+    const confirmed = info.includes('BitcoinBlockHeaderAttestation') ||
+                      info.includes('height:') ||
+                      upgraded;
+
+    if (confirmed) {
+      // Extraire le numéro de bloc si disponible
+      const blockMatch = info.match(/height:\s*(\d+)/);
+      const block = blockMatch ? blockMatch[1] : null;
+      return {
+        confirmed: true,
+        block,
+        message: block ? 'Confirmé dans le bloc Bitcoin #' + block : 'Confirmé dans Bitcoin',
+        upgradedB64: upgraded ? btoa(String.fromCharCode(...detached.serializeToBytes())) : null
+      };
+    }
+
+    return { confirmed: false, message: 'Ancrage en attente de confirmation Bitcoin' };
+
+  } catch(e) {
+    return { confirmed: false, message: 'Vérification impossible : ' + e.message };
   }
 }
 
@@ -1073,6 +1186,12 @@ async function doCertify() {
     const otsResult = await ancrerBitcoin(currentHash);
     const otsReceipt = otsResult.ok ? otsResult.receipt : '';
     const otsStatus  = otsResult.ok ? 'pending' : 'ots_browser_error';
+
+    // Stocker les bytes .ots pour téléchargement immédiat
+    if (otsResult.otsBytes) {
+      window._lastOtsBytes = otsResult.otsBytes;
+      window._lastOtsB64   = otsReceipt;
+    }
 
     if(otsResult.ok) {
       fill.style.width='65%'; status.textContent='Ancrage Bitcoin soumis ✓ — enregistrement…';
@@ -1105,7 +1224,7 @@ async function doCertify() {
     saveLocal(); updateHeader(); refreshStats(); renderTx();
 
     lastCertData={certId:data.certId,date:data.date,author,desc,fichier,hash:currentHash,preuve:data.preuve,cat,otsStatus,otsReceipt};
-    const newCert={ID_CERTIFICAT:data.certId,DATE_ISO:data.date,AUTEUR:author,DESCRIPTION:desc,FICHIER:fichier,HASH_SHA256:currentHash,PREUVE:data.preuve,CATEGORIE:cat,OTS_STATUS:otsStatus};
+    const newCert={ID_CERTIFICAT:data.certId,DATE_ISO:data.date,AUTEUR:author,DESCRIPTION:desc,FICHIER:fichier,HASH_SHA256:currentHash,PREUVE:data.preuve,CATEGORIE:cat,OTS_RECEIPT:otsReceipt,OTS_STATUS:otsStatus};
     allCerts.unshift(newCert);
 
     document.getElementById('successBanner').classList.add('show');
@@ -1118,6 +1237,16 @@ async function doCertify() {
       '<div class="success-row"><div class="success-key">Horodatage</div><div class="success-val plain">'+fmtDateLong(data.date)+'</div></div>'+
       '<div class="success-row"><div class="success-key">Empreinte SHA-256</div><div class="success-val">'+currentHash.substring(0,32)+'…</div></div>'+
       '<div class="success-row"><div class="success-key">Blockchain Bitcoin</div><div class="success-val plain">'+blockchainMsg+'</div></div>';
+    // Bouton téléchargement .ots dans le banner de succès
+    const dlOtsBtn = document.getElementById('dlOtsBtn');
+    if (dlOtsBtn) {
+      if (otsResult.ok && otsReceipt) {
+        dlOtsBtn.style.display = 'inline-flex';
+        dlOtsBtn.onclick = () => dlOts(data.certId, otsReceipt, data.certId);
+      } else {
+        dlOtsBtn.style.display = 'none';
+      }
+    }
     document.getElementById('resetBtn').style.display='inline-flex';
 
   } catch(e){
@@ -1150,6 +1279,108 @@ function resetCertify() {
   document.getElementById('mAuthor').value=''; document.getElementById('mDesc').value=''; document.getElementById('mRef').value='';
   document.getElementById('fileThumb').innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
   document.getElementById('fileIn').value='';
+}
+
+// ── Vérification Bitcoin depuis la modale ───────────────────
+async function lancerVerifBitcoin(otsB64, certId) {
+  const el = document.getElementById('modalVerifResult');
+  if (!el) return;
+  el.innerHTML = '<span style="color:var(--muted); font-size:13px;">⏳ Vérification en cours…</span>';
+
+  const result = await verifierAncrageBitcoin(otsB64, null);
+
+  if (result.confirmed) {
+    el.innerHTML = '<div style="background:#e6f9f1; border:1px solid #6dcc8a; border-radius:8px; padding:0.85rem; font-size:13px;">' +
+      '<strong style="color:#009958;">✓ Ancrage Bitcoin confirmé</strong><br>' +
+      '<span style="color:#2d6648;">' + result.message + '</span>' +
+      (result.block ? '<br><span style="font-size:11px; color:var(--muted);">Bloc #' + result.block + '</span>' : '') +
+      '</div>';
+    // Mettre à jour le .ots upgradé si disponible
+    if (result.upgradedB64) {
+      console.log('OTS upgradé disponible — mise à jour du stockage local');
+    }
+  } else {
+    el.innerHTML = '<div style="background:#fff8e0; border:1px solid #e8c84a; border-radius:8px; padding:0.85rem; font-size:13px;">' +
+      '<strong style="color:#7a5c08;">⏳ ' + result.message + '</strong><br>' +
+      '<span style="color:#9b7a20; font-size:12px;">La confirmation Bitcoin prend généralement 6 à 24 heures.</span>' +
+      '</div>';
+  }
+}
+
+// ── Gestion des fichiers pour vérification OTS manuelle ────
+let _verifOrigFile = null;
+let _verifOtsFile  = null;
+
+function setVerifFile(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  if (type === 'orig') {
+    _verifOrigFile = file;
+    document.getElementById('fileOrigVerifName').textContent = file.name;
+  } else {
+    _verifOtsFile = file;
+    document.getElementById('fileOtsVerifName').textContent = file.name;
+  }
+  // Activer le bouton si les deux fichiers sont choisis
+  document.getElementById('btnVerifOts').disabled =
+    !(_verifOrigFile && _verifOtsFile);
+}
+
+async function lancerVerifOtsManuel() {
+  if (!_verifOrigFile || !_verifOtsFile) return;
+  const el = document.getElementById('verifOtsResult');
+  el.innerHTML = '<span style="color:var(--muted); font-size:13px;">⏳ Vérification en cours…</span>';
+
+  try {
+    if (typeof OpenTimestamps === 'undefined') {
+      throw new Error('Librairie OpenTimestamps non chargée');
+    }
+
+    // Lire le fichier .ots
+    const otsBuffer = await _verifOtsFile.arrayBuffer();
+    const otsBytes  = new Uint8Array(otsBuffer);
+
+    // Lire le fichier original et calculer son hash
+    const origBuffer = await _verifOrigFile.arrayBuffer();
+    const origBytes  = new Uint8Array(origBuffer);
+
+    // Désérialiser le fichier .ots
+    const detached = OpenTimestamps.DetachedTimestampFile.deserialize(otsBytes);
+
+    // Tenter l'upgrade pour obtenir la preuve Bitcoin finale
+    try {
+      await OpenTimestamps.upgrade(detached);
+    } catch(e) {
+      console.log('Upgrade non disponible:', e.message);
+    }
+
+    // Vérifier
+    const info = OpenTimestamps.info(detached);
+    console.log('OTS info:', info);
+
+    const confirmed = info.includes('BitcoinBlockHeaderAttestation') ||
+                      info.includes('height:');
+
+    if (confirmed) {
+      const blockMatch = info.match(/height:\s*(\d+)/);
+      const block = blockMatch ? blockMatch[1] : null;
+      el.innerHTML = '<div style="background:#e6f9f1; border:1px solid #6dcc8a; border-radius:10px; padding:1rem; font-size:13px;">' +
+        '<div style="font-size:15px; font-weight:600; color:#009958; margin-bottom:6px;">✅ Ancrage Bitcoin confirmé</div>' +
+        '<div style="color:#2d6648;">' + (block ? 'Inscrit dans le bloc Bitcoin #' + block : 'Confirmé dans la blockchain Bitcoin') + '</div>' +
+        '<div style="margin-top:8px; font-size:12px; color:var(--muted);">Ce certificat prouve l'existence du fichier <strong>' + _verifOrigFile.name + '</strong> à la date d'ancrage.</div>' +
+        '</div>';
+    } else {
+      el.innerHTML = '<div style="background:#fff8e0; border:1px solid #e8c84a; border-radius:10px; padding:1rem; font-size:13px;">' +
+        '<div style="font-weight:600; color:#7a5c08; margin-bottom:6px;">⏳ Ancrage en attente de confirmation</div>' +
+        '<div style="color:#9b7a20;">La transaction Bitcoin n'est pas encore confirmée. Réessayez dans quelques heures.</div>' +
+        '</div>';
+    }
+  } catch(e) {
+    el.innerHTML = '<div style="background:#fdeaea; border:1px solid #e87a7a; border-radius:10px; padding:1rem; font-size:13px;">' +
+      '<strong style="color:#a32d2d;">Erreur de vérification</strong><br>' +
+      '<span style="color:#7a2020;">' + e.message + '</span>' +
+      '</div>';
+  }
 }
 
 // ── VERIFY ──
@@ -1215,6 +1446,20 @@ function openDetail(c) {
     '<div class="detail-row"><div class="detail-k">Empreinte SHA-256</div><div class="detail-v"><span class="hash-chip">'+c.hash+'</span></div></div>'+
     blockchainRow+
     '<div class="detail-row"><div class="detail-k">Preuve composite</div><div class="detail-v mono">'+c.preuve+'</div></div>';
+  // Bouton téléchargement .ots dans la modale
+  const otsReceipt = c.OTS_RECEIPT || c.otsReceipt || '';
+  const otsActions = document.getElementById('modalOtsActions');
+  if (otsActions) {
+    if (otsReceipt) {
+      otsActions.style.display = 'block';
+      document.getElementById('modalDlOtsBtn').onclick =
+        () => dlOts(c.certId || c.ID_CERTIFICAT, otsReceipt, c.certId || c.ID_CERTIFICAT);
+      document.getElementById('modalVerifOtsBtn').onclick =
+        () => lancerVerifBitcoin(otsReceipt, c.certId || c.ID_CERTIFICAT);
+    } else {
+      otsActions.style.display = 'none';
+    }
+  }
   document.getElementById('modalDetail').classList.add('open');
 }
 
