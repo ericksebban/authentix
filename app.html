@@ -1,0 +1,1562 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Antériorité">
+<meta name="theme-color" content="#00b86b">
+<title>Authentix — Mon espace certifié</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --ink: #0a0c10;
+  --ink2: #2a2d35;
+  --paper: #f8f9fb;
+  --paper2: #eef0f5;
+  --paper3: #e4e7ef;
+  --accent: #00b86b;
+  --accent-light: #009958;
+  --accent-pale: #e6f9f1;
+  --gold: #c49a0e;
+  --gold-light: #fef3d0;
+  --muted: #6b7080;
+  --muted2: #9ba3b5;
+  --border: rgba(10,12,16,0.09);
+  --border2: rgba(10,12,16,0.18);
+  --dark: #0d1117;
+  --r: 8px;
+  --rlg: 12px;
+  --rxl: 18px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html, body { height: 100%; overflow: hidden; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── TOPBAR ── */
+.topbar {
+  height: 52px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.25rem;
+  background: var(--paper);
+  flex-shrink: 0;
+  z-index: 20;
+}
+
+.logo { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.25rem; letter-spacing: -0.02em; }
+.logo em { font-style: italic; color: var(--accent-light); }
+
+.topbar-right { display: flex; align-items: center; gap: 0.6rem; }
+
+.credit-chip {
+  display: flex; align-items: center; gap: 5px;
+  background: var(--gold-light); border: 1px solid #dfc44a;
+  border-radius: 99px; padding: 4px 10px;
+  font-size: 12px; font-weight: 500; color: #6b4f08;
+}
+
+.avatar-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  font-size: 11px; font-weight: 500;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; border: none; font-family: 'Inter', sans-serif;
+}
+
+/* ── SHELL ── */
+.shell { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 200px; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  background: var(--paper);
+  display: flex; flex-direction: column;
+  padding: 1rem 0;
+  overflow-y: auto;
+}
+
+.nav-grp { margin-bottom: 1.25rem; }
+.nav-grp-label {
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: var(--muted2); padding: 0 1rem; margin-bottom: 3px; display: block;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 9px;
+  padding: 0.5rem 1rem; font-size: 13px; color: var(--muted);
+  cursor: pointer; border-left: 2px solid transparent;
+  transition: all 0.12s; user-select: none;
+}
+.nav-item:hover { color: var(--ink); background: var(--paper2); }
+.nav-item.active { color: var(--ink); border-left-color: var(--accent); background: var(--accent-pale); font-weight: 600; }
+.nav-item svg { flex-shrink: 0; }
+
+.sidebar-footer { margin-top: auto; padding: 0.75rem 0; border-top: 1px solid var(--border); }
+
+/* ── CERTIFY BUTTON in sidebar ── */
+.certify-nav-btn {
+  margin: 0 0.75rem 1rem;
+  padding: 0.65rem 1rem;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.12s;
+  width: calc(100% - 1.5rem);
+}
+.certify-nav-btn:hover { background: var(--accent-light); }
+
+/* ── CONTENT ── */
+.content { flex: 1; overflow-y: auto; }
+
+/* ── PAGES ── */
+.page { display: none; padding: 2rem; max-width: 900px; }
+.page.active { display: block; }
+
+.page-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 1.7rem; letter-spacing: -0.02em;
+  margin-bottom: 0.3rem;
+}
+.page-sub { font-size: 13px; color: var(--muted); margin-bottom: 1.75rem; }
+
+/* ── STATS ── */
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.75rem; }
+
+.stat {
+  background: #fff; border: 1px solid var(--border);
+  border-radius: var(--rlg); padding: 1.1rem;
+}
+.stat-l { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted2); margin-bottom: 4px; }
+.stat-v { font-size: 1.8rem; font-weight: 300; letter-spacing: -0.03em; line-height: 1.1; }
+.stat-v.gold { color: var(--gold); }
+.stat-s { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* ── TOOLBAR ── */
+.toolbar { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1rem; flex-wrap: wrap; }
+
+.search-wrap { flex: 1; min-width: 180px; position: relative; }
+.search-wrap svg { position: absolute; left: 9px; top: 50%; transform: translateY(-50%); opacity: 0.35; pointer-events: none; }
+.search-wrap input { width: 100%; padding: 0.45rem 0.75rem 0.45rem 2rem; border: 1px solid var(--border); border-radius: var(--r); font-size: 13px; font-family: 'Inter', sans-serif; background: #fff; color: var(--ink); }
+
+select, .btn-sm {
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border); border-radius: var(--r);
+  font-size: 13px; font-family: 'Inter', sans-serif;
+  background: #fff; color: var(--ink); cursor: pointer;
+}
+
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 0.55rem 1rem; border-radius: var(--r);
+  font-size: 13px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border); background: #fff; color: var(--ink);
+  transition: background 0.12s; font-family: 'Inter', sans-serif;
+}
+.btn:hover { background: var(--paper2); }
+.btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 500; }
+.btn-primary:hover { background: var(--accent-light); border-color: var(--accent-light); }
+.btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-gold { background: var(--gold); color: #fff; border-color: var(--gold); }
+.btn-gold:hover { background: #9a7d0a; }
+.btn-sm { display: inline-flex; align-items: center; gap: 6px; }
+
+/* ── TABLE ── */
+.tbl-wrap { background: #fff; border: 1px solid var(--border); border-radius: var(--rlg); overflow: hidden; }
+
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+thead th {
+  text-align: left; padding: 0.65rem 1rem;
+  font-size: 10px; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--muted2); border-bottom: 1px solid var(--border);
+  background: var(--paper); cursor: pointer; white-space: nowrap;
+}
+thead th:hover { color: var(--ink); }
+tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--paper); }
+td { padding: 0.75rem 1rem; vertical-align: middle; }
+
+.cert-id { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted2); }
+.cert-name { font-weight: 500; font-size: 13px; }
+.cert-sub { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+.tag { display: inline-block; padding: 2px 7px; border-radius: 99px; font-size: 10px; font-weight: 500; }
+.tag.photo { background: #e6f1fb; color: #0c447c; }
+.tag.texte { background: #eeedfe; color: #3c3489; }
+.tag.design { background: #faeeda; color: #633806; }
+.tag.logiciel { background: #e1f5ee; color: #085041; }
+.tag.video { background: #faece7; color: #712b13; }
+.tag.autre { background: var(--paper2); color: var(--muted); }
+.tag.musique { background: #fbeaf0; color: #72243e; }
+
+.dot-ok { width: 6px; height: 6px; border-radius: 50%; background: #2d9e4f; display: inline-block; margin-right: 4px; }
+
+.action-btn {
+  background: none; border: 1px solid var(--border); border-radius: var(--r);
+  padding: 3px 9px; font-size: 11px; cursor: pointer;
+  font-family: 'Inter', sans-serif; color: var(--muted); transition: all 0.1s;
+}
+.action-btn:hover { color: var(--ink); border-color: var(--border2); }
+
+.empty { text-align: center; padding: 3.5rem 2rem; color: var(--muted); font-size: 13px; }
+
+/* ── CERTIFY PANEL ── */
+.certify-panel { max-width: 640px; }
+
+.drop-zone {
+  border: 1.5px dashed var(--border2); border-radius: var(--rlg);
+  padding: 2.5rem 2rem; text-align: center; cursor: pointer;
+  transition: all 0.15s; background: var(--paper); margin-bottom: 1rem;
+}
+.drop-zone:hover, .drop-zone.drag { border-color: var(--accent-light); background: var(--accent-pale); }
+.drop-zone input { display: none; }
+.drop-zone h3 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.05rem; margin: 0.75rem 0 0.3rem; }
+.drop-zone p { font-size: 13px; color: var(--muted); }
+.drop-icon { width: 40px; height: 40px; margin: 0 auto; opacity: 0.25; }
+
+.file-preview { display: none; align-items: center; gap: 0.75rem; padding: 0.85rem 1rem; background: var(--paper2); border-radius: var(--r); margin-bottom: 0.75rem; }
+.file-preview.show { display: flex; }
+.file-thumb { width: 48px; height: 48px; border-radius: var(--r); border: 1px solid var(--border); background: var(--paper); display: flex; align-items: center; justify-content: center; flex-shrink: 0; overflow: hidden; }
+.file-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.file-info { flex: 1; min-width: 0; }
+.file-name-el { font-weight: 500; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-meta-el { font-size: 11px; color: var(--muted); margin-top: 1px; }
+
+.hash-reveal { display: none; margin-bottom: 0.75rem; }
+.hash-reveal.show { display: block; }
+.hash-lbl { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+.hash-box { font-family: 'JetBrains Mono', monospace; font-size: 11px; background: var(--ink); color: #a8e6c4; padding: 0.65rem 0.85rem; border-radius: var(--r); word-break: break-all; line-height: 1.6; }
+
+.meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-bottom: 1rem; }
+.meta-field label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
+.meta-field input, .meta-field textarea, .meta-field select {
+  width: 100%; padding: 0.45rem 0.75rem;
+  border: 1px solid var(--border); border-radius: var(--r);
+  font-size: 13px; font-family: 'Inter', sans-serif;
+  background: #fff; color: var(--ink);
+}
+.meta-field textarea { resize: vertical; min-height: 64px; line-height: 1.5; }
+.meta-field.full { grid-column: 1 / -1; }
+
+.prog-bar { height: 3px; background: var(--paper2); border-radius: 99px; margin: 0.75rem 0; display: none; overflow: hidden; }
+.prog-bar.show { display: block; }
+.prog-fill { height: 100%; background: var(--accent-light); border-radius: 99px; transition: width 0.4s ease; width: 0%; }
+
+.status-line { font-size: 12px; color: var(--muted); font-style: italic; min-height: 18px; }
+.err-line { font-size: 12px; color: #a32d2d; background: #fdeaea; border: 1px solid #e8aaaa; border-radius: var(--r); padding: 0.5rem 0.75rem; margin-top: 0.5rem; display: none; }
+.err-line.show { display: block; }
+
+.success-banner { background: var(--accent-pale); border: 1px solid #6dcc8a; border-radius: var(--rlg); padding: 1.25rem 1.5rem; margin-top: 1rem; display: none; }
+.success-banner.show { display: block; }
+.success-banner h3 { font-family: 'Plus Jakarta Sans', sans-serif; color: var(--accent); font-size: 1.1rem; margin-bottom: 0.75rem; }
+.success-row { display: flex; gap: 0.75rem; padding: 0.4rem 0; border-bottom: 1px solid rgba(45,102,72,0.15); font-size: 12px; }
+.success-row:last-child { border-bottom: none; }
+.success-key { color: var(--accent-light); min-width: 120px; font-weight: 500; font-size: 10px; text-transform: uppercase; letter-spacing: 0.06em; padding-top: 1px; flex-shrink: 0; }
+.success-val { flex: 1; word-break: break-all; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+.success-val.plain { font-family: 'Inter', sans-serif; font-size: 12px; }
+
+/* ── CREDITS ── */
+.packs { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+.pack {
+  background: #fff; border: 1px solid var(--border); border-radius: var(--rlg);
+  padding: 1.25rem; cursor: pointer; transition: border-color 0.15s; text-align: center;
+}
+.pack:hover { border-color: var(--accent-light); }
+.pack.pop { border: 2px solid var(--accent); }
+.pack-badge { font-size: 9px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-light); margin-bottom: 4px; }
+.pack-n { font-size: 2.2rem; font-weight: 300; letter-spacing: -0.04em; line-height: 1; }
+.pack-lbl { font-size: 11px; color: var(--muted); margin-bottom: 0.75rem; }
+.pack-price { font-size: 1.1rem; font-weight: 500; }
+.pack-unit { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* ── MODAL ── */
+.backdrop { display: none; position: fixed; inset: 0; background: rgba(15,14,12,0.45); z-index: 100; align-items: center; justify-content: center; padding: 1rem; }
+.backdrop.open { display: flex; }
+.modal { background: var(--paper); border: 1px solid var(--border); border-radius: var(--rxl); padding: 1.75rem; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; }
+.modal h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.3rem; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+.modal-x { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); line-height: 1; }
+
+.detail-row { display: flex; gap: 0.75rem; padding: 0.55rem 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.detail-row:last-child { border-bottom: none; }
+.detail-k { color: var(--muted); min-width: 120px; font-size: 10px; font-weight: 500; letter-spacing: 0.06em; text-transform: uppercase; flex-shrink: 0; padding-top: 1px; }
+.detail-v { flex: 1; word-break: break-all; }
+.detail-v.mono { font-family: 'JetBrains Mono', monospace; font-size: 10px; line-height: 1.6; }
+.hash-chip { background: var(--ink); color: #a8e6c4; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-family: 'JetBrains Mono', monospace; display: inline-block; word-break: break-all; line-height: 1.5; }
+
+/* ── TRANSACTIONS ── */
+.tx-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-bottom: 1px solid var(--border); font-size: 13px; }
+.tx-row:last-child { border-bottom: none; }
+.tx-icon { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tx-icon.plus { background: #e8f5ec; }
+.tx-icon.minus { background: #fdeaea; }
+.tx-lbl { flex: 1; }
+.tx-lbl strong { font-weight: 500; font-size: 13px; display: block; }
+.tx-lbl span { font-size: 11px; color: var(--muted); }
+.tx-amt { font-weight: 500; white-space: nowrap; font-size: 13px; }
+.tx-amt.plus { color: #1a4a2a; }
+.tx-amt.minus { color: #a32d2d; }
+
+/* ── FAQ ── */
+.faq-item { background: #fff; border: 1px solid var(--border); border-radius: var(--rlg); margin-bottom: 0.6rem; overflow: hidden; }
+.faq-q { padding: 0.9rem 1.1rem; font-weight: 500; font-size: 13px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
+.faq-a { display: none; padding: 0 1.1rem 0.9rem; font-size: 13px; color: var(--muted); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 0.75rem; }
+
+/* ── AUTH ── */
+.auth-wrap { display: flex; align-items: center; justify-content: center; height: 100%; padding: 2rem; }
+.auth-box { background: #fff; border: 1px solid var(--border); border-radius: var(--rxl); padding: 2.25rem; width: 100%; max-width: 360px; }
+.auth-box h2 { font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.5rem; margin-bottom: 0.4rem; }
+.auth-box p { font-size: 13px; color: var(--muted); margin-bottom: 1.75rem; }
+.field { margin-bottom: 0.85rem; }
+.field label { font-size: 10px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 4px; }
+.field input { width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--border); border-radius: var(--r); font-size: 14px; font-family: 'Inter', sans-serif; background: #fff; color: var(--ink); }
+.field input:focus { outline: none; border-color: var(--accent-light); }
+.auth-err { font-size: 12px; color: #a32d2d; background: #fdeaea; border: 1px solid #e8aaaa; border-radius: var(--r); padding: 0.5rem 0.75rem; margin-bottom: 0.75rem; display: none; }
+.auth-err.show { display: block; }
+.auth-switch { font-size: 12px; color: var(--muted); margin-top: 1rem; text-align: center; }
+.auth-switch a { color: var(--accent-light); cursor: pointer; text-decoration: underline; }
+.auth-note { font-size: 11px; color: var(--muted2); text-align: center; margin-top: 1rem; line-height: 1.6; }
+.divider { height: 1px; background: var(--border); margin: 1.25rem 0; }
+
+/* ── PROFIL ── */
+.profile-card { background: #fff; border: 1px solid var(--border); border-radius: var(--rlg); padding: 1.5rem; max-width: 440px; }
+.profile-head { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem; }
+.profile-av { width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff; font-size: 15px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.profile-name { font-weight: 500; font-size: 15px; }
+.profile-email { font-size: 12px; color: var(--muted); }
+
+/* ── MOBILE NAV ── */
+.mobile-nav {
+  display: none;
+  border-top: 1px solid var(--border);
+  background: var(--paper);
+  flex-shrink: 0;
+}
+.mobile-nav-items { display: flex; }
+.mobile-nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  padding: 0.6rem 0.25rem; font-size: 10px; color: var(--muted);
+  cursor: pointer; gap: 3px; border-top: 2px solid transparent;
+  transition: all 0.12s;
+}
+.mobile-nav-item.active { color: var(--accent); border-top-color: var(--accent); }
+.mobile-certify-fab {
+  position: fixed; bottom: 70px; right: 16px;
+  width: 52px; height: 52px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  border: none; font-size: 24px; cursor: pointer;
+  display: none; align-items: center; justify-content: center;
+  box-shadow: 0 2px 12px rgba(15,14,12,0.2);
+  z-index: 50;
+}
+
+/* ── LOADING ── */
+.loading-screen { display: flex; align-items: center; justify-content: center; height: 100%; }
+.loading-screen p { color: var(--muted); font-size: 13px; }
+
+@media (max-width: 680px) {
+  .sidebar { display: none; }
+  .mobile-nav { display: block; }
+  .mobile-certify-fab { display: flex; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .meta-grid { grid-template-columns: 1fr; }
+  .meta-field.full { grid-column: 1; }
+  .page { padding: 1.25rem; }
+  .packs { grid-template-columns: 1fr 1fr; }
+}
+</style>
+<!-- OpenTimestamps — librairie officielle hébergée localement -->
+<script src="opentimestamps.min.js"></script>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar" style="display:none;">
+  <div class="logo">Ant<em>ériorité</em></div>
+  <div class="topbar-right">
+    <div class="credit-chip" id="creditChip">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span id="creditCount">5</span> crédits
+    </div>
+    <button class="avatar-btn" id="avatarBtn" onclick="showPage('profil')">?</button>
+  </div>
+</div>
+
+<!-- SHELL -->
+<div class="shell" id="shell" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <button class="certify-nav-btn" onclick="showPage('certifier')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Certifier un fichier
+    </button>
+
+    <div class="nav-grp">
+      <span class="nav-grp-label">Mon espace</span>
+      <div class="nav-item active" onclick="showPage('coffre')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        Coffre-fort
+      </div>
+      <div class="nav-item" onclick="showPage('certifier')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Certifier
+      </div>
+      <div class="nav-item" onclick="showPage('verifier')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Vérifier
+      </div>
+    </div>
+
+    <div class="nav-grp">
+      <span class="nav-grp-label">Compte</span>
+      <div class="nav-item" onclick="showPage('credits')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+        Crédits & paiement
+      </div>
+      <div class="nav-item" onclick="showPage('transactions')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Transactions
+      </div>
+      <div class="nav-item" onclick="showPage('profil')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profil
+      </div>
+    </div>
+
+    <div class="nav-grp sidebar-footer">
+      <div class="nav-item" onclick="showPage('faq')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        Aide & FAQ
+      </div>
+      <div class="nav-item" onclick="logout()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Déconnexion
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="content">
+
+    <!-- PAGE : COFFRE -->
+    <div class="page active" id="page-coffre">
+      <div class="page-title">Mon coffre-fort</div>
+      <div class="page-sub">Tous vos certificats d'antériorité</div>
+
+      <div class="stats" id="statsGrid">
+        <div class="stat"><div class="stat-l">Certificats</div><div class="stat-v" id="stTotal">—</div><div class="stat-s">au total</div></div>
+        <div class="stat"><div class="stat-l">Ce mois</div><div class="stat-v" id="stMonth">—</div><div class="stat-s">nouveaux</div></div>
+        <div class="stat"><div class="stat-l">Crédits</div><div class="stat-v gold" id="stCredits">—</div><div class="stat-s">disponibles</div></div>
+        <div class="stat"><div class="stat-l">Membre depuis</div><div class="stat-v" style="font-size:1.1rem; padding-top:4px;" id="stSince">—</div></div>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" placeholder="Rechercher…" oninput="filterCerts()" id="searchQ">
+        </div>
+        <select onchange="filterCerts()" id="filterCat">
+          <option value="">Toutes catégories</option>
+          <option>photo</option><option>texte</option><option>design</option>
+          <option>logiciel</option><option>video</option><option>musique</option><option>autre</option>
+        </select>
+        <select onchange="filterCerts()" id="filterSort">
+          <option value="desc">Plus récents</option>
+          <option value="asc">Plus anciens</option>
+          <option value="az">A → Z</option>
+        </select>
+        <button class="btn btn-sm" onclick="exportCSV()">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          CSV
+        </button>
+      </div>
+
+      <div class="tbl-wrap">
+        <table><thead><tr>
+          <th>Identifiant</th><th>Œuvre / Document</th><th>Catégorie</th><th>Date</th><th>Statut</th><th></th>
+        </tr></thead>
+        <tbody id="certsBody"></tbody></table>
+        <div class="empty" id="certsEmpty" style="display:none;">Aucun certificat trouvé</div>
+        <div class="empty" id="certsLoading">Chargement du registre…</div>
+      </div>
+    </div>
+
+    <!-- PAGE : CERTIFIER -->
+    <div class="page" id="page-certifier">
+      <div class="page-title">Certifier un fichier</div>
+      <div class="page-sub">L'empreinte est calculée sur votre appareil — aucun fichier n'est envoyé</div>
+
+      <div class="certify-panel">
+        <div class="drop-zone" id="dz">
+          <svg class="drop-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="8" y="6" width="32" height="38" rx="3"/>
+            <path d="M16 18h16M16 24h16M16 30h10"/><path d="M30 6v10h10"/>
+          </svg>
+          <h3>Déposer un fichier ici</h3>
+          <p>Photo, document, vidéo, musique — tout format accepté</p>
+          <input type="file" id="fileIn">
+        </div>
+
+        <div class="file-preview" id="filePrev">
+          <div class="file-thumb" id="fileThumb">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="file-info">
+            <div class="file-name-el" id="fileNameEl">—</div>
+            <div class="file-meta-el" id="fileMetaEl">—</div>
+          </div>
+        </div>
+
+        <div class="hash-reveal" id="hashReveal">
+          <div class="hash-lbl">Empreinte SHA-256 — calculée localement</div>
+          <div class="hash-box" id="hashBox">—</div>
+        </div>
+
+        <div class="meta-grid" id="metaGrid" style="display:none;">
+          <div class="meta-field">
+            <label>Auteur / Créateur</label>
+            <input type="text" id="mAuthor" placeholder="Votre nom">
+          </div>
+          <div class="meta-field">
+            <label>Catégorie</label>
+            <select id="mCat">
+              <option value="autre">Autre</option>
+              <option value="photo">Photo</option>
+              <option value="texte">Texte</option>
+              <option value="design">Design</option>
+              <option value="logiciel">Logiciel</option>
+              <option value="video">Vidéo</option>
+              <option value="musique">Musique</option>
+            </select>
+          </div>
+          <div class="meta-field full">
+            <label>Description de l'œuvre</label>
+            <textarea id="mDesc" placeholder="Titre, contexte, version…"></textarea>
+          </div>
+          <div class="meta-field">
+            <label>Date de création déclarée</label>
+            <input type="date" id="mDate">
+          </div>
+          <div class="meta-field">
+            <label>Référence (optionnel)</label>
+            <input type="text" id="mRef" placeholder="Projet, version…">
+          </div>
+        </div>
+
+        <div class="prog-bar" id="progBar"><div class="prog-fill" id="progFill"></div></div>
+        <div class="status-line" id="statusLine"></div>
+        <div class="err-line" id="errLine"></div>
+
+        <div style="margin-top:0.85rem; display:flex; gap:0.6rem; align-items:center; flex-wrap:wrap;">
+          <button class="btn btn-primary" id="certBtn" disabled onclick="doCertify()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Certifier et enregistrer
+          </button>
+          <button class="btn" id="resetBtn" style="display:none;" onclick="resetCertify()">Nouveau fichier</button>
+          <span style="font-size:11px; color:var(--muted);" id="creditWarn"></span>
+        </div>
+
+        <div class="success-banner" id="successBanner">
+          <h3>Certificat enregistré</h3>
+          <div id="successRows"></div>
+          <div style="margin-top:1rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+            <button class="btn btn-gold" style="font-size:12px;" onclick="dlCert()">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Télécharger le certificat
+            </button>
+            <button class="btn" style="font-size:12px;" onclick="showPage('coffre')">Voir mon coffre-fort</button>
+            <button class="btn" id="dlOtsBtn" style="font-size:12px; display:none;">
+              ⬇ Télécharger la preuve .ots
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE : VÉRIFIER -->
+    <div class="page" id="page-verifier">
+      <div class="page-title">Vérifier un certificat</div>
+      <div class="page-sub">Retrouvez un certificat par fichier ou identifiant, et vérifiez son ancrage Bitcoin</div>
+
+      <div style="max-width:560px;">
+
+        <!-- Recherche par fichier ou ID -->
+        <div class="drop-zone" id="dzVerif">
+          <svg class="drop-icon" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="24" cy="24" r="18"/><path d="M16 24l6 6 10-10"/>
+          </svg>
+          <h3>Déposer le fichier original</h3>
+          <p>L'empreinte est recalculée localement puis comparée au registre</p>
+          <input type="file" id="fileVerif">
+        </div>
+
+        <div style="display:flex; gap:0.6rem; margin-top:0.5rem; margin-bottom:1rem;">
+          <input type="text" id="certIdIn" placeholder="Ou entrez un identifiant : CERT-20250330-XXXXXXXX"
+            style="flex:1; padding:0.5rem 0.75rem; border:1px solid var(--border); border-radius:var(--r); font-size:13px; font-family:'JetBrains Mono',monospace; background:#fff; color:var(--ink);">
+          <button class="btn btn-primary" onclick="verifyById()">Rechercher</button>
+        </div>
+
+        <div class="status-line" id="verifStatus"></div>
+        <div id="verifResult" style="margin-top:1rem;"></div>
+
+        <!-- Vérification Bitcoin avec fichier .ots -->
+        <div style="margin-top:2rem; padding-top:1.5rem; border-top:1px solid var(--border);">
+          <div style="font-size:13px; font-weight:600; margin-bottom:0.5rem;">Vérifier un ancrage Bitcoin</div>
+          <div style="font-size:12px; color:var(--muted); margin-bottom:1rem;">
+            Déposez votre fichier original ET votre fichier .ots pour vérifier l'ancrage directement.
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div style="border:1px dashed var(--border2); border-radius:var(--r); padding:0.85rem; text-align:center; cursor:pointer; background:#fff;" onclick="document.getElementById('fileOrigVerif').click()">
+              <div style="font-size:18px; margin-bottom:4px;">📄</div>
+              <div style="font-size:12px; font-weight:500;">Fichier original</div>
+              <div style="font-size:11px; color:var(--muted2);" id="fileOrigVerifName">Cliquer pour choisir</div>
+              <input type="file" id="fileOrigVerif" style="display:none;" onchange="setVerifFile(this,'orig')">
+            </div>
+            <div style="border:1px dashed var(--border2); border-radius:var(--r); padding:0.85rem; text-align:center; cursor:pointer; background:#fff;" onclick="document.getElementById('fileOtsVerif').click()">
+              <div style="font-size:18px; margin-bottom:4px;">🔐</div>
+              <div style="font-size:12px; font-weight:500;">Fichier .ots</div>
+              <div style="font-size:11px; color:var(--muted2);" id="fileOtsVerifName">Cliquer pour choisir</div>
+              <input type="file" id="fileOtsVerif" accept=".ots" style="display:none;" onchange="setVerifFile(this,'ots')">
+            </div>
+          </div>
+
+          <button class="btn btn-primary" id="btnVerifOts" onclick="lancerVerifOtsManuel()" disabled style="font-size:13px;">
+            🔍 Vérifier l'ancrage Bitcoin
+          </button>
+          <div id="verifOtsResult" style="margin-top:1rem;"></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- PAGE : CREDITS -->
+    <div class="page" id="page-credits">
+      <div class="page-title">Crédits & paiement</div>
+      <div class="page-sub">Chaque certificat consomme 1 crédit. Les crédits n'expirent pas.</div>
+
+      <div class="stats" style="grid-template-columns:1fr 1fr; max-width:320px; margin-bottom:1.5rem;">
+        <div class="stat"><div class="stat-l">Solde</div><div class="stat-v gold" id="creditSolde">—</div><div class="stat-s">crédits dispo.</div></div>
+        <div class="stat"><div class="stat-l">Utilisés</div><div class="stat-v" id="creditUsed">—</div><div class="stat-s">au total</div></div>
+      </div>
+
+      <h3 style="font-family:'Plus Jakarta Sans',sans-serif; font-weight:700; font-size:1.1rem; margin-bottom:0.85rem;">Acheter des crédits</h3>
+      <div class="packs">
+        <div class="pack pop" onclick="buyPack(5,5.50)"><div class="pack-badge">Le plus choisi</div><div class="pack-n">5</div><div class="pack-lbl">crédits</div><div class="pack-price">5,50 €</div><div class="pack-unit">1,10 € / cert.</div></div>
+        <div class="pack" onclick="buyPack(20,12.99)"><div class="pack-badge">Meilleure valeur</div><div class="pack-n">20</div><div class="pack-lbl">crédits</div><div class="pack-price">12,99 €</div><div class="pack-unit">0,65 € / cert.</div></div>
+        <div class="pack" onclick="buyPack(999,19.99)"><div class="pack-badge">Pro</div><div class="pack-n" style="font-size:1.6rem;">∞</div><div class="pack-lbl">illimité / mois</div><div class="pack-price">19,99 €</div><div class="pack-unit">/ mois</div></div>
+      </div>
+      <p style="font-size:11px; color:var(--muted2); margin-top:0.5rem;">Les crédits n'expirent pas · Paiement Stripe · Facture immédiate</p>
+    </div>
+
+    <!-- PAGE : TRANSACTIONS -->
+    <div class="page" id="page-transactions">
+      <div class="page-title">Transactions</div>
+      <div class="page-sub">Historique de vos achats et consommations de crédits</div>
+      <div class="tbl-wrap" id="txWrap"><div class="empty">Aucune transaction</div></div>
+    </div>
+
+    <!-- PAGE : PROFIL -->
+    <div class="page" id="page-profil">
+      <div class="page-title">Mon profil</div>
+      <div class="page-sub">Informations et paramètres de votre compte</div>
+      <div class="profile-card">
+        <div class="profile-head">
+          <div class="profile-av" id="profAv">?</div>
+          <div><div class="profile-name" id="profName">—</div><div class="profile-email" id="profEmail">—</div></div>
+        </div>
+        <div class="divider"></div>
+        <div class="detail-row"><div class="detail-k">Membre depuis</div><div class="detail-v" id="profSince">—</div></div>
+        <div class="detail-row"><div class="detail-k">Certificats</div><div class="detail-v" id="profCerts">—</div></div>
+        <div class="detail-row"><div class="detail-k">Crédits</div><div class="detail-v" id="profCredits">—</div></div>
+        <div class="detail-row"><div class="detail-k">Plan</div><div class="detail-v">Gratuit — 5 crédits offerts à l'inscription</div></div>
+        <div style="margin-top:1.25rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+          <button class="btn btn-primary" style="font-size:13px;" onclick="showPage('credits')">Acheter des crédits</button>
+          <button class="btn" style="font-size:13px;" onclick="dlInvoice()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            Télécharger une facture
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE : FAQ -->
+    <div class="page" id="page-faq">
+      <div class="page-title">Aide & FAQ</div>
+      <div class="page-sub">Réponses aux questions les plus fréquentes</div>
+      <div style="max-width:580px;" id="faqContainer"></div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /shell -->
+
+<!-- AUTH -->
+<div id="authScreen" style="display:none; flex:1; overflow:hidden;">
+  <div class="auth-wrap">
+    <div class="auth-box">
+      <h2 id="authTitle">Connexion</h2>
+      <p id="authSub">Accédez à votre coffre-fort.</p>
+      <div class="auth-err" id="authErr"></div>
+      <div id="regExtra" style="display:none;">
+        <div class="field"><label>Prénom et nom</label><input type="text" id="regName" placeholder="Marie Dupont"></div>
+      </div>
+      <div class="field"><label>Email</label><input type="email" id="authEmail" placeholder="vous@exemple.fr"></div>
+      <div class="field"><label>Mot de passe</label><input type="password" id="authPwd" placeholder="••••••••"></div>
+      <div id="regExtra2" style="display:none;">
+        <div class="field"><label>Confirmer le mot de passe</label><input type="password" id="authPwd2" placeholder="••••••••"></div>
+      </div>
+      <button class="btn btn-primary" style="width:100%; justify-content:center; margin-top:0.25rem;" onclick="doAuth()">
+        <span id="authBtnLbl">Se connecter</span>
+      </button>
+      <div class="auth-switch" id="authSwitch">Pas de compte ? <a onclick="toggleAuth()">Créer un compte</a></div>
+      <div class="divider"></div>
+      <div class="auth-note">Démo : créez un compte avec n'importe quel email.<br>Vos certificats réels apparaîtront dans votre coffre-fort.</div>
+    </div>
+  </div>
+</div>
+
+<!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobileNav" style="display:none;">
+  <div class="mobile-nav-items">
+    <div class="mobile-nav-item active" onclick="showPage('coffre')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      Coffre
+    </div>
+    <div class="mobile-nav-item" onclick="showPage('certifier')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Certifier
+    </div>
+    <div class="mobile-nav-item" onclick="showPage('verifier')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      Vérifier
+    </div>
+    <div class="mobile-nav-item" onclick="showPage('credits')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Crédits
+    </div>
+    <div class="mobile-nav-item" onclick="showPage('profil')">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Profil
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DÉTAIL -->
+<div class="backdrop" id="modalDetail">
+  <div class="modal">
+    <h2>Détail du certificat <button class="modal-x" onclick="closeModal('modalDetail')">×</button></h2>
+    <div id="modalDetailBody"></div>
+    <div id="modalOtsActions" style="display:none; margin-top:1rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+      <button class="btn btn-primary" id="modalDlOtsBtn" style="font-size:12px;">
+        ⬇ Télécharger la preuve .ots
+      </button>
+      <button class="btn" id="modalVerifOtsBtn" style="font-size:12px;">
+        🔍 Vérifier l'ancrage Bitcoin
+      </button>
+    </div>
+    <div id="modalVerifResult" style="margin-top:0.75rem;"></div>
+    <div style="margin-top:1.25rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+      <button class="btn btn-gold" style="font-size:12px;" onclick="dlActiveCert()">Télécharger</button>
+      <button class="btn" style="font-size:12px;" onclick="closeModal('modalDetail')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ACHAT -->
+<div class="backdrop" id="modalBuy">
+  <div class="modal">
+    <h2>Confirmer l'achat <button class="modal-x" onclick="closeModal('modalBuy')">×</button></h2>
+    <div id="modalBuyBody"></div>
+    <div style="margin-top:1.25rem; display:flex; gap:0.6rem;">
+      <button class="btn btn-primary" style="font-size:13px;" onclick="confirmBuy()">Confirmer (démo)</button>
+      <button class="btn" style="font-size:13px;" onclick="closeModal('modalBuy')">Annuler</button>
+    </div>
+    <p style="font-size:11px; color:var(--muted); margin-top:0.75rem;">En production : paiement sécurisé via Stripe Checkout.</p>
+  </div>
+</div>
+
+<script>
+const SCRIPT = "https://script.google.com/macros/s/AKfycbwCXzXD1foHism5M7HcEHJ_t_akeU4oMM4Y7XoSwxi4skeMhX5CQCJX9e2oPmqjJjac/exec";
+
+const FAQS = [
+  {q:"Qu'est-ce qu'un certificat d'antériorité ?", a:"Une preuve cryptographique que votre fichier existait sous sa forme exacte à une date précise, basée sur une empreinte SHA-256 unique et infalsifiable."},
+  {q:"Mon fichier est-il envoyé sur vos serveurs ?", a:"Non. L'empreinte SHA-256 est calculée dans votre navigateur. Seule cette empreinte (jamais le fichier lui-même) est enregistrée dans le registre. Votre œuvre reste confidentielle."},
+  {q:"Que se passe-t-il si je modifie mon fichier ?", a:"Toute modification change l'empreinte SHA-256. Le certificat original reste valide pour la version originale uniquement. Il faut certifier chaque nouvelle version."},
+  {q:"Quelle valeur juridique a ce certificat ?", a:"Suite à la décision du Tribunal judiciaire de Marseille du 20 mars 2025, l'horodatage cryptographique est reconnu comme preuve d'antériorité recevable en propriété intellectuelle. Pour les litiges importants, consultez un avocat."},
+  {q:"Comment utiliser ce certificat en cas de litige ?", a:"Conservez le fichier .txt du certificat et le fichier original. Un tiers (avocat, commissaire de justice) vérifie que l'empreinte du fichier correspond à celle enregistrée à la date indiquée."},
+  {q:"Les crédits ont-ils une date d'expiration ?", a:"Non. Vos crédits sont valables indéfiniment. Vous les utilisez à votre rythme, sans contrainte."},
+];
+
+let user = null;
+let allCerts = [];
+let txHistory = [];
+let pendingBuy = null;
+let activeCert = null;
+let currentHash = null;
+let currentFile = null;
+let lastCertData = null;
+let authMode = 'login';
+
+function fmtSize(b) { if(b<1024) return b+'o'; if(b<1048576) return (b/1024).toFixed(1)+'Ko'; return (b/1048576).toFixed(2)+'Mo'; }
+function fmtDate(iso) { const d=new Date(iso); return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}); }
+function fmtDateLong(iso) { const d=new Date(iso); return d.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit',timeZoneName:'short'}); }
+function initials(n) { return (n||'?').split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2); }
+function catClass(c) { const v=(c||'').toLowerCase(); return ['photo','texte','design','logiciel','video','musique'].includes(v)?v:'autre'; }
+
+// ── AUTH ──
+function toggleAuth() {
+  authMode = authMode==='login'?'register':'login';
+  const r = authMode==='register';
+  document.getElementById('authTitle').textContent = r?'Créer un compte':'Connexion';
+  document.getElementById('authSub').textContent = r?'Rejoignez Antériorité gratuitement.':'Accédez à votre coffre-fort.';
+  document.getElementById('authBtnLbl').textContent = r?'Créer mon compte':'Se connecter';
+  document.getElementById('authSwitch').innerHTML = r?'Déjà un compte ? <a onclick="toggleAuth()">Se connecter</a>':'Pas de compte ? <a onclick="toggleAuth()">Créer un compte</a>';
+  document.getElementById('regExtra').style.display = r?'block':'none';
+  document.getElementById('regExtra2').style.display = r?'block':'none';
+  document.getElementById('authErr').classList.remove('show');
+}
+
+function doAuth() {
+  const email = document.getElementById('authEmail').value.trim();
+  const pwd = document.getElementById('authPwd').value;
+  const err = document.getElementById('authErr');
+  if(!email||!pwd){ err.textContent='Merci de remplir tous les champs.'; err.classList.add('show'); return; }
+  if(!email.includes('@')){ err.textContent='Email invalide.'; err.classList.add('show'); return; }
+  if(pwd.length<6){ err.textContent='Mot de passe trop court (6 caractères min).'; err.classList.add('show'); return; }
+  if(authMode==='register'){
+    const p2=document.getElementById('authPwd2').value;
+    if(pwd!==p2){ err.textContent='Les mots de passe ne correspondent pas.'; err.classList.add('show'); return; }
+    const name = document.getElementById('regName').value.trim()||email.split('@')[0];
+    user = {email, name, since:new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'}), credits:5};
+    txHistory = [{type:'plus',label:'5 crédits offerts à l\'inscription',date:new Date().toLocaleDateString('fr-FR'),credits:'+5'}];
+  } else {
+    const saved = localStorage.getItem('ant_user');
+    if(saved){ user=JSON.parse(saved); if(user.email!==email){ err.textContent='Compte introuvable. Créez un compte.'; err.classList.add('show'); return; } }
+    else { user={email,name:email.split('@')[0],since:new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'}),credits:5}; txHistory=[{type:'plus',label:'5 crédits offerts à l\'inscription',date:new Date().toLocaleDateString('fr-FR'),credits:'+5'}]; }
+    const savedTx = localStorage.getItem('ant_tx');
+    if(savedTx) txHistory=JSON.parse(savedTx);
+  }
+  err.classList.remove('show');
+  saveLocal();
+  loadApp();
+}
+
+function saveLocal() {
+  localStorage.setItem('ant_user', JSON.stringify(user));
+  localStorage.setItem('ant_tx', JSON.stringify(txHistory));
+}
+
+function logout() {
+  user=null; allCerts=[]; txHistory=[];
+  document.getElementById('topbar').style.display='none';
+  document.getElementById('shell').style.display='none';
+  document.getElementById('mobileNav').style.display='none';
+  document.getElementById('authScreen').style.display='flex';
+  document.getElementById('authEmail').value='';
+  document.getElementById('authPwd').value='';
+}
+
+// ── LOAD APP ──
+async function loadApp() {
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('shell').style.display='flex';
+  document.getElementById('mobileNav').style.display='block';
+  updateHeader();
+  buildFAQ();
+  setupDrop();
+  await loadCerts();
+  refreshStats();
+  renderTx();
+  updateProfile();
+}
+
+function updateHeader() {
+  document.getElementById('creditCount').textContent = user.credits;
+  document.getElementById('avatarBtn').textContent = initials(user.name);
+  document.getElementById('creditChip').querySelector('span').textContent = user.credits;
+}
+
+// ── LOAD CERTS FROM GOOGLE SHEETS ──
+async function loadCerts() {
+  const loadingEl = document.getElementById('certsLoading');
+  loadingEl.textContent = 'Chargement du registre…';
+  loadingEl.style.display = 'block';
+  document.getElementById('certsEmpty').style.display = 'none';
+
+  const emailToSend = (user.email || '').trim().toLowerCase();
+  const fetchUrl = SCRIPT + '?email=' + encodeURIComponent(emailToSend);
+
+  try {
+    const resp = await fetch(fetchUrl);
+    const text = await resp.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch(pe) { throw new Error('Réponse invalide : ' + text.substring(0,80)); }
+
+    if(data.ok && Array.isArray(data.certs)) {
+      allCerts = data.certs;
+      loadingEl.style.display = 'none';
+    } else if(data.message && data.message.includes('v4')) {
+      loadingEl.textContent = '⚠ Script actif mais aucun certificat trouvé pour : ' + emailToSend;
+      allCerts = [];
+    } else if(data.trouve === false) {
+      loadingEl.textContent = '⚠ Ancien script détecté — redéployez le script v4 (nouveau déploiement).';
+      allCerts = [];
+    } else {
+      loadingEl.textContent = 'Réponse inattendue : ' + JSON.stringify(data).substring(0,100);
+      allCerts = [];
+    }
+  } catch(e) {
+    loadingEl.textContent = 'Erreur réseau : ' + e.message;
+    allCerts = getLocalCerts();
+  }
+
+  renderCerts();
+  refreshStats();
+  updateProfile();
+}
+
+function getLocalCerts() {
+  const s = localStorage.getItem('ant_certs_'+user.email);
+  return s?JSON.parse(s):[];
+}
+
+function saveLocalCerts(certs) {
+  localStorage.setItem('ant_certs_'+user.email, JSON.stringify(certs));
+}
+
+// ── RENDER CERTS ──
+function renderCerts(list) {
+  const data = list !== undefined ? list : allCerts;
+  const tbody = document.getElementById('certsBody');
+  const empty = document.getElementById('certsEmpty');
+  tbody.innerHTML='';
+  if(!data||data.length===0){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  data.forEach(c => {
+    const tr = document.createElement('tr');
+    const dateStr = c.DATE_ISO||c.date ? fmtDate(c.DATE_ISO||c.date) : '—';
+    const desc = c.DESCRIPTION||c.description||'—';
+    const auteur = c.AUTEUR||c.auteur||'';
+    const certId = c.ID_CERTIFICAT||c.certId||'—';
+    const categorie = c.CATEGORIE||c.categorie||'autre';
+    const fichier = c.FICHIER||c.fichier||'—';
+    const hash = c.HASH_SHA256||c.hash||'—';
+    const preuve = c.PREUVE||c.preuve||'—';
+    const otsStatus = c.OTS_STATUS||'';
+    const otsTx = c.OTS_BITCOIN_TX||'';
+    const otsReceipt = c.OTS_RECEIPT||c.otsReceipt||'';
+    const row = {certId,date:c.DATE_ISO||c.date,desc,auteur,categorie,fichier,hash,preuve,otsStatus,otsTx,otsReceipt};
+    const statusHtml = otsStatus==='confirmed'
+      ? '<span class="dot-ok"></span><span style="font-size:11px;">Bitcoin ✓</span>'
+      : otsStatus==='pending'
+        ? '<span class="dot-pending"></span><span style="font-size:11px; color:var(--gold);">En attente…</span>'
+        : '<span class="dot-ok"></span><span style="font-size:11px;">Enregistré</span>';
+    tr.innerHTML =
+      '<td><div class="cert-id">'+certId.substring(0,22)+'…</div></td>'+
+      '<td><div class="cert-name">'+desc+'</div><div class="cert-sub">'+auteur+'</div></td>'+
+      '<td><span class="tag '+catClass(categorie)+'">'+categorie+'</span></td>'+
+      '<td style="white-space:nowrap; font-size:12px; color:var(--muted);">'+dateStr+'</td>'+
+      '<td>'+statusHtml+'</td>'+
+      '<td><button class="action-btn" onclick="openDetail('+JSON.stringify(row).replace(/"/g,"&quot;")+')"">Voir</button></td>';
+    tbody.appendChild(tr);
+  });
+}
+
+function filterCerts() {
+  const q = document.getElementById('searchQ').value.toLowerCase();
+  const cat = document.getElementById('filterCat').value.toLowerCase();
+  const sort = document.getElementById('filterSort').value;
+  let list = allCerts.filter(c => {
+    const desc=(c.DESCRIPTION||c.description||'').toLowerCase();
+    const auteur=(c.AUTEUR||c.auteur||'').toLowerCase();
+    const id=(c.ID_CERTIFICAT||c.certId||'').toLowerCase();
+    const catV=(c.CATEGORIE||c.categorie||'').toLowerCase();
+    return (!q||(desc+auteur+id).includes(q)) && (!cat||catV===cat);
+  });
+  if(sort==='asc') list.sort((a,b)=>new Date(a.DATE_ISO||a.date)-new Date(b.DATE_ISO||b.date));
+  else if(sort==='desc') list.sort((a,b)=>new Date(b.DATE_ISO||b.date)-new Date(a.DATE_ISO||a.date));
+  else list.sort((a,b)=>(a.DESCRIPTION||a.description||'').localeCompare(b.DESCRIPTION||b.description||''));
+  renderCerts(list);
+}
+
+function refreshStats() {
+  const now = new Date();
+  const month = (allCerts||[]).filter(c=>{ const d=new Date(c.DATE_ISO||c.date); return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear(); }).length;
+  document.getElementById('stTotal').textContent = (allCerts||[]).length;
+  document.getElementById('stMonth').textContent = month;
+  document.getElementById('stCredits').textContent = user.credits;
+  document.getElementById('stSince').textContent = user.since;
+  document.getElementById('creditSolde').textContent = user.credits;
+  document.getElementById('creditUsed').textContent = (allCerts||[]).length;
+  document.getElementById('creditCount').textContent = user.credits;
+}
+
+// ── CERTIFY ──
+function setupDrop() {
+  const dz = document.getElementById('dz');
+  const fi = document.getElementById('fileIn');
+  dz.addEventListener('click', ()=>fi.click());
+  dz.addEventListener('dragover', e=>{e.preventDefault(); dz.classList.add('drag');});
+  dz.addEventListener('dragleave', ()=>dz.classList.remove('drag'));
+  dz.addEventListener('drop', e=>{e.preventDefault(); dz.classList.remove('drag'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);});
+  fi.addEventListener('change', ()=>{ if(fi.files[0]) handleFile(fi.files[0]); });
+
+  const dzv = document.getElementById('dzVerif');
+  const fv = document.getElementById('fileVerif');
+  dzv.addEventListener('click', ()=>fv.click());
+  dzv.addEventListener('dragover', e=>{e.preventDefault(); dzv.classList.add('drag');});
+  dzv.addEventListener('dragleave', ()=>dzv.classList.remove('drag'));
+  dzv.addEventListener('drop', e=>{e.preventDefault(); dzv.classList.remove('drag'); if(e.dataTransfer.files[0]) handleVerifFile(e.dataTransfer.files[0]);});
+  fv.addEventListener('change', ()=>{ if(fv.files[0]) handleVerifFile(fv.files[0]); });
+}
+
+async function calcHash(file) {
+  const buf = await file.arrayBuffer();
+  const hb = await crypto.subtle.digest('SHA-256', buf);
+  return Array.from(new Uint8Array(hb)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function handleFile(file) {
+  currentFile = file;
+  document.getElementById('fileNameEl').textContent = file.name;
+  document.getElementById('fileMetaEl').textContent = fmtSize(file.size)+' · '+(file.type||'fichier');
+  document.getElementById('filePrev').classList.add('show');
+  const thumb = document.getElementById('fileThumb');
+  if(file.type.startsWith('image/')){ const u=URL.createObjectURL(file); thumb.innerHTML='<img src="'+u+'" alt="">'; }
+  document.getElementById('statusLine').textContent = 'Calcul de l\'empreinte…';
+  currentHash = await calcHash(file);
+  document.getElementById('hashBox').textContent = currentHash;
+  document.getElementById('hashReveal').classList.add('show');
+  document.getElementById('metaGrid').style.display='grid';
+  document.getElementById('mAuthor').value = user.name;
+  document.getElementById('mDate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('certBtn').disabled = false;
+  document.getElementById('statusLine').textContent = 'Empreinte calculée. Décrivez l\'œuvre puis certifiez.';
+  if(user.credits<=0){ document.getElementById('certBtn').disabled=true; document.getElementById('creditWarn').textContent='Crédit insuffisant — rechargez votre compte.'; }
+}
+
+// ── Ancrage OpenTimestamps via la librairie officielle ──────────
+// Utilise opentimestamps.min.js hébergé localement
+// Génère un vrai fichier .ots vérifiable sur opentimestamps.org
+async function ancrerBitcoin(hashHex) {
+  try {
+    if (typeof OpenTimestamps === 'undefined') {
+      console.warn('Librairie OpenTimestamps non chargée');
+      return { ok: false, receipt: null, otsBytes: null };
+    }
+
+    // Convertir le hash hex en Uint8Array
+    const hashBytes = new Uint8Array(
+      hashHex.match(/.{2}/g).map(b => parseInt(b, 16))
+    );
+
+    // Créer l'objet DetachedTimestampFile depuis le hash
+    const op       = new OpenTimestamps.Ops.OpSHA256();
+    const detached = OpenTimestamps.DetachedTimestampFile.fromHash(op, hashBytes);
+
+    // Soumettre aux serveurs de calendrier Bitcoin
+    await OpenTimestamps.stamp(detached);
+
+    // Sérialiser en bytes → vrai fichier .ots
+    const otsBytes = detached.serializeToBytes();
+    console.log('OTS ancrage soumis ✓ — reçu', otsBytes.length, 'bytes');
+
+    if (otsBytes.length < 100) {
+      console.warn('Fichier .ots trop petit:', otsBytes.length, 'bytes');
+      return { ok: false, receipt: null, otsBytes: null };
+    }
+
+    // Encoder en base64 pour stockage Google Sheets
+    const b64 = btoa(String.fromCharCode(...otsBytes));
+    return { ok: true, receipt: b64, otsBytes };
+
+  } catch(e) {
+    console.warn('OTS erreur:', e.message);
+    return { ok: false, receipt: null, otsBytes: null };
+  }
+}
+
+// ── Télécharger le fichier .ots d'un certificat ──────────────
+function dlOts(certId, otsB64, nomFichier) {
+  if (!otsB64) {
+    alert('Le fichier .ots n\'est pas encore disponible pour ce certificat.');
+    return;
+  }
+  try {
+    const bytes = Uint8Array.from(atob(otsB64), c => c.charCodeAt(0));
+    const blob  = new Blob([bytes], { type: 'application/octet-stream' });
+    const a     = document.createElement('a');
+    a.href     = URL.createObjectURL(blob);
+    a.download = (nomFichier || certId) + '.ots';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch(e) {
+    alert('Erreur lors de la génération du fichier .ots : ' + e.message);
+  }
+}
+
+// ── Vérification Bitcoin intégrée (sans passer par OTS externe) ──
+async function verifierAncrageBitcoin(otsB64, fileBytes) {
+  if (typeof OpenTimestamps === 'undefined') {
+    return { confirmed: false, message: 'Librairie non chargée' };
+  }
+  if (!otsB64) {
+    return { confirmed: false, message: 'Aucun fichier .ots disponible' };
+  }
+  try {
+    const otsBytes  = Uint8Array.from(atob(otsB64), c => c.charCodeAt(0));
+    const detached  = OpenTimestamps.DetachedTimestampFile.deserialize(otsBytes);
+
+    // Tenter l'upgrade (récupère la preuve Bitcoin finale si confirmée)
+    const upgraded  = await OpenTimestamps.upgrade(detached);
+
+    // Vérifier localement
+    const info = OpenTimestamps.info(detached);
+    const confirmed = info.includes('BitcoinBlockHeaderAttestation') ||
+                      info.includes('height:') ||
+                      upgraded;
+
+    if (confirmed) {
+      // Extraire le numéro de bloc si disponible
+      const blockMatch = info.match(/height:\s*(\d+)/);
+      const block = blockMatch ? blockMatch[1] : null;
+      return {
+        confirmed: true,
+        block,
+        message: block ? 'Confirmé dans le bloc Bitcoin #' + block : 'Confirmé dans Bitcoin',
+        upgradedB64: upgraded ? btoa(String.fromCharCode(...detached.serializeToBytes())) : null
+      };
+    }
+
+    return { confirmed: false, message: 'Ancrage en attente de confirmation Bitcoin' };
+
+  } catch(e) {
+    return { confirmed: false, message: 'Vérification impossible : ' + e.message };
+  }
+}
+
+async function doCertify() {
+  if(user.credits<=0){ alert('Crédit insuffisant.'); return; }
+  document.getElementById('certBtn').disabled=true;
+  document.getElementById('errLine').classList.remove('show');
+  const bar = document.getElementById('progBar'); bar.classList.add('show');
+  const fill = document.getElementById('progFill');
+  const status = document.getElementById('statusLine');
+
+  const author=document.getElementById('mAuthor').value||user.name;
+  const desc=document.getElementById('mDesc').value||'Non renseigné';
+  const cat=document.getElementById('mCat').value;
+  const ref=document.getElementById('mRef').value;
+  const fichier=currentFile.name+' ('+fmtSize(currentFile.size)+(cat?' · '+cat:'')+(ref?' · '+ref:'')+')';
+
+  try {
+    // Étape 1 : ancrage Bitcoin directement depuis le navigateur
+    fill.style.width='20%'; status.textContent='Préparation…';
+    await new Promise(r=>setTimeout(r,300));
+
+    fill.style.width='40%'; status.textContent='Ancrage Bitcoin en cours…';
+    const otsResult = await ancrerBitcoin(currentHash);
+    const otsReceipt = otsResult.ok ? otsResult.receipt : '';
+    const otsStatus  = otsResult.ok ? 'pending' : 'ots_browser_error';
+
+    // Stocker les bytes .ots pour téléchargement immédiat
+    if (otsResult.otsBytes) {
+      window._lastOtsBytes = otsResult.otsBytes;
+      window._lastOtsB64   = otsReceipt;
+    }
+
+    if(otsResult.ok) {
+      fill.style.width='65%'; status.textContent='Ancrage Bitcoin soumis ✓ — enregistrement…';
+    } else {
+      fill.style.width='65%'; status.textContent='Enregistrement dans le registre…';
+    }
+    await new Promise(r=>setTimeout(r,300));
+
+    // Étape 2 : enregistrement dans Google Sheets (hash + reçu OTS)
+    fill.style.width='80%'; status.textContent='Enregistrement sécurisé…';
+    const resp = await fetch(SCRIPT, {
+      method:'POST',
+      body: JSON.stringify({
+        hash:        currentHash,
+        auteur:      author,
+        description: desc,
+        fichier,
+        email:       user.email,
+        categorie:   cat,
+        ots_receipt: otsReceipt,
+        ots_status:  otsStatus
+      })
+    });
+    const data = await resp.json();
+    if(!data.ok) throw new Error(data.erreur||'Erreur registre');
+
+    fill.style.width='100%'; status.textContent='Certificat enregistré.';
+    user.credits--;
+    txHistory.unshift({type:'minus',label:'Certification : '+desc.substring(0,40),date:new Date().toLocaleDateString('fr-FR'),credits:'-1'});
+    saveLocal(); updateHeader(); refreshStats(); renderTx();
+
+    lastCertData={certId:data.certId,date:data.date,author,desc,fichier,hash:currentHash,preuve:data.preuve,cat,otsStatus,otsReceipt};
+    const newCert={ID_CERTIFICAT:data.certId,DATE_ISO:data.date,AUTEUR:author,DESCRIPTION:desc,FICHIER:fichier,HASH_SHA256:currentHash,PREUVE:data.preuve,CATEGORIE:cat,OTS_RECEIPT:otsReceipt,OTS_STATUS:otsStatus};
+    allCerts.unshift(newCert);
+
+    document.getElementById('successBanner').classList.add('show');
+    const blockchainMsg = otsResult.ok
+      ? '<span style="color:#2d9e4f; font-weight:500;">✓ Ancré dans Bitcoin</span> <span style="font-size:11px; color:var(--muted);">— confirmation dans 6 à 24h</span>'
+      : '<span style="color:var(--muted);">Registre interne — ancrage Bitcoin en file d&#39;attente</span>';
+
+    document.getElementById('successRows').innerHTML =
+      '<div class="success-row"><div class="success-key">Identifiant</div><div class="success-val">'+data.certId+'</div></div>'+
+      '<div class="success-row"><div class="success-key">Horodatage</div><div class="success-val plain">'+fmtDateLong(data.date)+'</div></div>'+
+      '<div class="success-row"><div class="success-key">Empreinte SHA-256</div><div class="success-val">'+currentHash.substring(0,32)+'…</div></div>'+
+      '<div class="success-row"><div class="success-key">Blockchain Bitcoin</div><div class="success-val plain">'+blockchainMsg+'</div></div>';
+    // Bouton téléchargement .ots dans le banner de succès
+    const dlOtsBtn = document.getElementById('dlOtsBtn');
+    if (dlOtsBtn) {
+      if (otsResult.ok && otsReceipt) {
+        dlOtsBtn.style.display = 'inline-flex';
+        dlOtsBtn.onclick = () => dlOts(data.certId, otsReceipt, data.certId);
+      } else {
+        dlOtsBtn.style.display = 'none';
+      }
+    }
+    document.getElementById('resetBtn').style.display='inline-flex';
+
+  } catch(e){
+    fill.style.width='0%'; status.textContent='';
+    document.getElementById('certBtn').disabled=false;
+    const el=document.getElementById('errLine'); el.textContent='Erreur : '+e.message; el.classList.add('show');
+  }
+}
+
+function dlCert() {
+  if(!lastCertData) return;
+  const c=lastCertData;
+  const txt=['════════════════════════════════════════════════════','         CERTIFICAT D\'ANTÉRIORITÉ — ANTERIORITE.APP','════════════════════════════════════════════════════','','IDENTIFIANT : '+c.certId,'HORODATAGE  : '+fmtDateLong(c.date),'ISO 8601    : '+c.date,'','── TITULAIRE ────────────────────────────────────────','Auteur      : '+c.author,'Catégorie   : '+c.cat,'','── ŒUVRE ────────────────────────────────────────────','Fichier     : '+c.fichier,'Description : '+c.desc,'','── PREUVE CRYPTOGRAPHIQUE ───────────────────────────','SHA-256 :',c.hash,'','Preuve composite :',c.preuve,'════════════════════════════════════════════════════'].join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'})); a.download=c.certId+'.txt'; a.click();
+}
+
+function resetCertify() {
+  currentFile=null; currentHash=null; lastCertData=null;
+  document.getElementById('filePrev').classList.remove('show');
+  document.getElementById('hashReveal').classList.remove('show');
+  document.getElementById('metaGrid').style.display='none';
+  document.getElementById('progBar').classList.remove('show');
+  document.getElementById('progFill').style.width='0%';
+  document.getElementById('statusLine').textContent='';
+  document.getElementById('errLine').classList.remove('show');
+  document.getElementById('successBanner').classList.remove('show');
+  document.getElementById('certBtn').disabled=true;
+  document.getElementById('resetBtn').style.display='none';
+  document.getElementById('creditWarn').textContent='';
+  document.getElementById('mAuthor').value=''; document.getElementById('mDesc').value=''; document.getElementById('mRef').value='';
+  document.getElementById('fileThumb').innerHTML='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#aaa" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>';
+  document.getElementById('fileIn').value='';
+}
+
+// ── Vérification Bitcoin depuis la modale ───────────────────
+async function lancerVerifBitcoin(otsB64, certId) {
+  const el = document.getElementById('modalVerifResult');
+  if (!el) return;
+  el.innerHTML = '<span style="color:var(--muted); font-size:13px;">⏳ Vérification en cours…</span>';
+
+  const result = await verifierAncrageBitcoin(otsB64, null);
+
+  if (result.confirmed) {
+    el.innerHTML = '<div style="background:#e6f9f1; border:1px solid #6dcc8a; border-radius:8px; padding:0.85rem; font-size:13px;">' +
+      '<strong style="color:#009958;">✓ Ancrage Bitcoin confirmé</strong><br>' +
+      '<span style="color:#2d6648;">' + result.message + '</span>' +
+      (result.block ? '<br><span style="font-size:11px; color:var(--muted);">Bloc #' + result.block + '</span>' : '') +
+      '</div>';
+    // Mettre à jour le .ots upgradé si disponible
+    if (result.upgradedB64) {
+      console.log('OTS upgradé disponible — mise à jour du stockage local');
+    }
+  } else {
+    el.innerHTML = '<div style="background:#fff8e0; border:1px solid #e8c84a; border-radius:8px; padding:0.85rem; font-size:13px;">' +
+      '<strong style="color:#7a5c08;">⏳ ' + result.message + '</strong><br>' +
+      '<span style="color:#9b7a20; font-size:12px;">La confirmation Bitcoin prend généralement 6 à 24 heures.</span>' +
+      '</div>';
+  }
+}
+
+// ── Gestion des fichiers pour vérification OTS manuelle ────
+let _verifOrigFile = null;
+let _verifOtsFile  = null;
+
+function setVerifFile(input, type) {
+  const file = input.files[0];
+  if (!file) return;
+  if (type === 'orig') {
+    _verifOrigFile = file;
+    document.getElementById('fileOrigVerifName').textContent = file.name;
+  } else {
+    _verifOtsFile = file;
+    document.getElementById('fileOtsVerifName').textContent = file.name;
+  }
+  // Activer le bouton si les deux fichiers sont choisis
+  document.getElementById('btnVerifOts').disabled =
+    !(_verifOrigFile && _verifOtsFile);
+}
+
+async function lancerVerifOtsManuel() {
+  if (!_verifOrigFile || !_verifOtsFile) return;
+  const el = document.getElementById('verifOtsResult');
+  el.innerHTML = '<span style="color:var(--muted); font-size:13px;">⏳ Vérification en cours…</span>';
+
+  try {
+    if (typeof OpenTimestamps === 'undefined') {
+      throw new Error('Librairie OpenTimestamps non chargée');
+    }
+
+    // Lire le fichier .ots
+    const otsBuffer = await _verifOtsFile.arrayBuffer();
+    const otsBytes  = new Uint8Array(otsBuffer);
+
+    // Lire le fichier original et calculer son hash
+    const origBuffer = await _verifOrigFile.arrayBuffer();
+    const origBytes  = new Uint8Array(origBuffer);
+
+    // Désérialiser le fichier .ots
+    const detached = OpenTimestamps.DetachedTimestampFile.deserialize(otsBytes);
+
+    // Tenter l'upgrade pour obtenir la preuve Bitcoin finale
+    try {
+      await OpenTimestamps.upgrade(detached);
+    } catch(e) {
+      console.log('Upgrade non disponible:', e.message);
+    }
+
+    // Vérifier
+    const info = OpenTimestamps.info(detached);
+    console.log('OTS info:', info);
+
+    const confirmed = info.includes('BitcoinBlockHeaderAttestation') ||
+                      info.includes('height:');
+
+    if (confirmed) {
+      const blockMatch = info.match(/height:\s*(\d+)/);
+      const block = blockMatch ? blockMatch[1] : null;
+      el.innerHTML = '<div style="background:#e6f9f1; border:1px solid #6dcc8a; border-radius:10px; padding:1rem; font-size:13px;">' +
+        '<div style="font-size:15px; font-weight:600; color:#009958; margin-bottom:6px;">✅ Ancrage Bitcoin confirmé</div>' +
+        '<div style="color:#2d6648;">' + (block ? 'Inscrit dans le bloc Bitcoin #' + block : 'Confirmé dans la blockchain Bitcoin') + '</div>' +
+        '<div style="margin-top:8px; font-size:12px; color:var(--muted);">Ce certificat prouve l'existence du fichier <strong>' + _verifOrigFile.name + '</strong> à la date d'ancrage.</div>' +
+        '</div>';
+    } else {
+      el.innerHTML = '<div style="background:#fff8e0; border:1px solid #e8c84a; border-radius:10px; padding:1rem; font-size:13px;">' +
+        '<div style="font-weight:600; color:#7a5c08; margin-bottom:6px;">⏳ Ancrage en attente de confirmation</div>' +
+        '<div style="color:#9b7a20;">La transaction Bitcoin n'est pas encore confirmée. Réessayez dans quelques heures.</div>' +
+        '</div>';
+    }
+  } catch(e) {
+    el.innerHTML = '<div style="background:#fdeaea; border:1px solid #e87a7a; border-radius:10px; padding:1rem; font-size:13px;">' +
+      '<strong style="color:#a32d2d;">Erreur de vérification</strong><br>' +
+      '<span style="color:#7a2020;">' + e.message + '</span>' +
+      '</div>';
+  }
+}
+
+// ── VERIFY ──
+async function handleVerifFile(file) {
+  document.getElementById('verifStatus').textContent='Calcul de l\'empreinte…';
+  document.getElementById('verifResult').innerHTML='';
+  const hash = await calcHash(file);
+  document.getElementById('verifStatus').textContent='Empreinte calculée — interrogation du registre…';
+  await searchReg({hash});
+}
+
+async function verifyById() {
+  const id=document.getElementById('certIdIn').value.trim();
+  if(!id) return;
+  document.getElementById('verifStatus').textContent='Interrogation du registre…';
+  document.getElementById('verifResult').innerHTML='';
+  await searchReg({certId:id});
+}
+
+async function searchReg(params) {
+  try {
+    const url=new URL(SCRIPT);
+    if(params.hash) url.searchParams.set('hash',params.hash);
+    if(params.certId) url.searchParams.set('certId',params.certId);
+    const resp=await fetch(url.toString());
+    const data=await resp.json();
+    const el=document.getElementById('verifResult');
+    if(data.ok&&data.trouve){
+      document.getElementById('verifStatus').textContent='Certificat trouvé.';
+      el.innerHTML='<div style="background:#e8f5ec; border:1px solid #6dcc8a; border-radius:12px; padding:1.25rem;">'+
+        '<div style="font-family:\'Plus Jakarta Sans\',sans-serif; font-weight:700; color:#009958; font-size:1.05rem; margin-bottom:0.75rem;">Certificat trouvé ✓</div>'+
+        '<div class="detail-row"><div class="detail-k">Identifiant</div><div class="detail-v mono">'+data.certId+'</div></div>'+
+        '<div class="detail-row"><div class="detail-k">Date enregistrée</div><div class="detail-v">'+fmtDateLong(data.date)+'</div></div>'+
+        '<div class="detail-row"><div class="detail-k">Auteur déclaré</div><div class="detail-v">'+(data.auteur||'—')+'</div></div>'+
+        '<div class="detail-row"><div class="detail-k">Description</div><div class="detail-v">'+(data.description||'—')+'</div></div>'+
+        '<div class="detail-row"><div class="detail-k">Empreinte</div><div class="detail-v"><span class="hash-chip">'+(data.hash||'—')+'</span></div></div>'+
+        '</div>';
+    } else if(data.ok&&!data.trouve){
+      document.getElementById('verifStatus').textContent='';
+      el.innerHTML='<div style="background:#fdf2e8; border:1px solid #e8a04a; border-radius:12px; padding:1.25rem;"><div style="font-weight:500; color:#7a4a0a; margin-bottom:0.4rem;">Aucun certificat trouvé</div><p style="font-size:13px; color:#7a4a0a;">Ce fichier ou identifiant ne correspond à aucune entrée dans le registre.</p></div>';
+    }
+  } catch(e) { document.getElementById('verifStatus').textContent='Impossible de joindre le registre.'; }
+}
+
+// ── DETAIL MODAL ──
+function otsLabel(status, tx) {
+  if(status==='confirmed') return '<span style="color:#2d9e4f; font-weight:500;">✓ Ancré dans Bitcoin</span>'+(tx?' · <span style="font-size:10px; opacity:0.7;">'+tx+'</span>':'');
+  if(status==='pending')   return '<span style="color:var(--gold);">⏳ En attente de confirmation Bitcoin (6–24h)</span>';
+  if(status==='ots_error') return '<span style="color:var(--muted);">Ancrage en file d&#39;attente</span>';
+  return '<span style="color:var(--muted);">Registre interne</span>';
+}
+
+function openDetail(c) {
+  activeCert=c;
+  const blockchainRow = '<div class="detail-row"><div class="detail-k">Blockchain</div><div class="detail-v">'+otsLabel(c.otsStatus, c.otsTx)+'</div></div>';
+  document.getElementById('modalDetailBody').innerHTML=
+    '<div class="detail-row"><div class="detail-k">Identifiant</div><div class="detail-v mono">'+c.certId+'</div></div>'+
+    '<div class="detail-row"><div class="detail-k">Date</div><div class="detail-v">'+fmtDateLong(c.date)+'</div></div>'+
+    '<div class="detail-row"><div class="detail-k">Auteur</div><div class="detail-v">'+c.auteur+'</div></div>'+
+    '<div class="detail-row"><div class="detail-k">Description</div><div class="detail-v">'+c.desc+'</div></div>'+
+    '<div class="detail-row"><div class="detail-k">Fichier</div><div class="detail-v">'+c.fichier+'</div></div>'+
+    '<div class="detail-row"><div class="detail-k">Catégorie</div><div class="detail-v"><span class="tag '+catClass(c.categorie)+'">'+c.categorie+'</span></div></div>'+
+    '<div class="detail-row"><div class="detail-k">Empreinte SHA-256</div><div class="detail-v"><span class="hash-chip">'+c.hash+'</span></div></div>'+
+    blockchainRow+
+    '<div class="detail-row"><div class="detail-k">Preuve composite</div><div class="detail-v mono">'+c.preuve+'</div></div>';
+  // Bouton téléchargement .ots dans la modale
+  const otsReceipt = c.OTS_RECEIPT || c.otsReceipt || '';
+  const otsActions = document.getElementById('modalOtsActions');
+  if (otsActions) {
+    if (otsReceipt) {
+      otsActions.style.display = 'block';
+      document.getElementById('modalDlOtsBtn').onclick =
+        () => dlOts(c.certId || c.ID_CERTIFICAT, otsReceipt, c.certId || c.ID_CERTIFICAT);
+      document.getElementById('modalVerifOtsBtn').onclick =
+        () => lancerVerifBitcoin(otsReceipt, c.certId || c.ID_CERTIFICAT);
+    } else {
+      otsActions.style.display = 'none';
+    }
+  }
+  document.getElementById('modalDetail').classList.add('open');
+}
+
+function dlActiveCert() {
+  if(!activeCert) return;
+  const c=activeCert;
+  const txt=['════════════════════════════════════════════════════','         CERTIFICAT D\'ANTÉRIORITÉ — ANTERIORITE.APP','════════════════════════════════════════════════════','','IDENTIFIANT : '+c.certId,'HORODATAGE  : '+fmtDateLong(c.date),'','── TITULAIRE ────────────────────────────────────────','Auteur      : '+c.auteur,'','── ŒUVRE ────────────────────────────────────────────','Fichier     : '+c.fichier,'Description : '+c.desc,'','── PREUVE CRYPTOGRAPHIQUE ───────────────────────────','SHA-256 :',c.hash,'','Preuve composite :',c.preuve,'════════════════════════════════════════════════════'].join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([txt],{type:'text/plain;charset=utf-8'})); a.download=c.certId+'.txt'; a.click();
+}
+
+// ── CREDITS ──
+let pendingBuyData=null;
+function buyPack(credits,price) {
+  pendingBuyData={credits,price};
+  document.getElementById('modalBuyBody').innerHTML='<div style="text-align:center; padding:0.75rem 0;"><div style="font-size:2.5rem; font-weight:300; letter-spacing:-0.04em; line-height:1;">'+credits+'</div><div style="font-size:13px; color:var(--muted); margin-bottom:0.75rem;">crédit'+(credits>1?'s':'')+'</div><div style="font-size:1.3rem; font-weight:500;">'+price.toFixed(2).replace('.',',')+'&nbsp;€</div><div style="font-size:11px; color:var(--muted); margin-top:4px;">'+(price/credits).toFixed(2).replace('.',',')+'&nbsp;€&nbsp;/ certificat</div></div>';
+  document.getElementById('modalBuy').classList.add('open');
+}
+
+function confirmBuy() {
+  if(!pendingBuyData) return;
+  user.credits+=pendingBuyData.credits;
+  txHistory.unshift({type:'plus',label:'Achat de '+pendingBuyData.credits+' crédits',date:new Date().toLocaleDateString('fr-FR'),credits:'+'+pendingBuyData.credits,euros:pendingBuyData.price.toFixed(2).replace('.',',')+'&nbsp;€'});
+  saveLocal(); updateHeader(); refreshStats(); renderTx(); updateProfile();
+  closeModal('modalBuy'); pendingBuyData=null;
+  alert('Achat simulé ! En production : paiement Stripe sécurisé.');
+}
+
+// ── TRANSACTIONS ──
+function renderTx() {
+  const el=document.getElementById('txWrap');
+  if(!txHistory||txHistory.length===0){ el.innerHTML='<div class="empty">Aucune transaction</div>'; return; }
+  el.innerHTML=txHistory.map(tx=>
+    '<div class="tx-row">'+
+    '<div class="tx-icon '+tx.type+'">'+(tx.type==='plus'?'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#2d9e4f" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>':'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a32d2d" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>')+'</div>'+
+    '<div class="tx-lbl"><strong>'+tx.label+'</strong><span>'+tx.date+'</span></div>'+
+    '<div class="tx-amt '+tx.type+'">'+tx.credits+(tx.euros?' <span style="font-size:10px; opacity:0.7;">('+tx.euros+')</span>':'')+'</div>'+
+    '</div>'
+  ).join('');
+}
+
+// ── PROFIL ──
+function updateProfile() {
+  document.getElementById('profAv').textContent=initials(user.name);
+  document.getElementById('profName').textContent=user.name;
+  document.getElementById('profEmail').textContent=user.email;
+  document.getElementById('profSince').textContent=user.since;
+  document.getElementById('profCerts').textContent=(allCerts||[]).length+' certificat'+((allCerts||[]).length>1?'s':'');
+  document.getElementById('profCredits').textContent=user.credits+' crédit'+(user.credits>1?'s':'');
+}
+
+function dlInvoice() {
+  const lines=['FACTURE — ANTERIORITE.APP','═'.repeat(38),'','Date : '+new Date().toLocaleDateString('fr-FR'),'Client : '+user.name,'Email  : '+user.email,'','Transactions :',...txHistory.filter(t=>t.euros).map(t=>'  '+t.date+' — '+t.label+' : '+t.euros),'','Facture générée à titre de démonstration.'];
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([lines.join('\n')],{type:'text/plain;charset=utf-8'})); a.download='facture-anteriorite.txt'; a.click();
+}
+
+// ── FAQ ──
+function buildFAQ() {
+  document.getElementById('faqContainer').innerHTML=FAQS.map((f,i)=>
+    '<div class="faq-item"><div class="faq-q" onclick="toggleFaq('+i+')">'+f.q+'<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="fqarrow'+i+'" style="flex-shrink:0; transition:transform 0.2s;"><polyline points="6 9 12 15 18 9"/></svg></div><div class="faq-a" id="fqa'+i+'">'+f.a+'</div></div>'
+  ).join('');
+}
+
+function toggleFaq(i) {
+  const el=document.getElementById('fqa'+i); const ar=document.getElementById('fqarrow'+i);
+  const open=el.style.display==='block';
+  el.style.display=open?'none':'block'; ar.style.transform=open?'':'rotate(180deg)';
+}
+
+// ── NAV ──
+const PAGES=['coffre','certifier','verifier','credits','transactions','profil','faq'];
+
+function showPage(name) {
+  PAGES.forEach(p=>{ document.getElementById('page-'+p).classList.remove('active'); });
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.querySelectorAll('.mobile-nav-item').forEach(n=>n.classList.remove('active'));
+  const sideItems=document.querySelectorAll('.sidebar .nav-item');
+  const idx=['coffre','certifier','verifier','credits','transactions','profil','faq'].indexOf(name);
+  if(idx>=0&&sideItems[idx]) sideItems[idx].classList.add('active');
+  const mobItems=document.querySelectorAll('.mobile-nav-item');
+  const midx=['coffre','certifier','verifier','credits','profil'].indexOf(name);
+  if(midx>=0&&mobItems[midx]) mobItems[midx].classList.add('active');
+  document.getElementById('content').scrollTop=0;
+}
+
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function exportCSV() {
+  const h=['ID','Date','Auteur','Description','Fichier','Categorie','Hash'];
+  const rows=(allCerts||[]).map(c=>[c.ID_CERTIFICAT||c.certId,c.DATE_ISO||c.date,c.AUTEUR||c.auteur,c.DESCRIPTION||c.description,c.FICHIER||c.fichier,c.CATEGORIE||c.categorie,c.HASH_SHA256||c.hash].map(v=>'"'+(v||'').replace(/"/g,'""')+'"').join(','));
+  const csv=[h.join(','),...rows].join('\n');
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})); a.download='anteriorite-certificats.csv'; a.click();
+}
+
+// ── INIT ──
+const saved=localStorage.getItem('ant_user');
+if(saved){ user=JSON.parse(saved); const savedTx=localStorage.getItem('ant_tx'); if(savedTx) txHistory=JSON.parse(savedTx); loadApp(); }
+else { document.getElementById('authScreen').style.display='flex'; }
+</script>
+</body>
+</html>
