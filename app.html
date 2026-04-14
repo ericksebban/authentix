@@ -1337,11 +1337,10 @@ function setVerifFile(input, type) {
 async function lancerVerifOtsManuel() {
   if (!_verifOrigFile || !_verifOtsFile) return;
   const el = document.getElementById('verifOtsResult');
-  el.innerHTML = '<span style="color:var(--muted); font-size:13px;">⏳ Vérification en cours…</span>';
 
   try {
     if (typeof OpenTimestamps === 'undefined') {
-      throw new Error('Librairie OpenTimestamps non chargée');
+      throw new Error('Librairie OpenTimestamps non chargée — rechargez la page');
     }
 
     // Lire le fichier .ots
@@ -1352,22 +1351,52 @@ async function lancerVerifOtsManuel() {
     const origBuffer = await _verifOrigFile.arrayBuffer();
     const origBytes  = new Uint8Array(origBuffer);
 
+    el.innerHTML = '<span style="color:var(--muted); font-size:13px;">⏳ Étape 1/3 — Lecture du fichier .ots…</span>';
+    await new Promise(r => setTimeout(r, 100));
+
     // Désérialiser le fichier .ots
     const detached = OpenTimestamps.DetachedTimestampFile.deserialize(otsBytes);
 
-    // Tenter l'upgrade (récupère la preuve Bitcoin si disponible)
-    let upgraded = false;
-    try {
-      const result = await OpenTimestamps.upgrade(detached);
-      upgraded = result;
-      console.log('OTS upgrade:', upgraded ? 'mis à jour' : 'pas de changement');
-    } catch(e) {
-      console.log('Upgrade:', e.message);
+    // Étape 1 : vérifier que le hash du fichier original correspond au .ots
+    // On recalcule le hash du fichier original
+    el.innerHTML = '<span style="color:var(--muted); font-size:13px;">⏳ Étape 2/3 — Vérification de la correspondance…</span>';
+    await new Promise(r => setTimeout(r, 100));
+
+    const hashOp   = new OpenTimestamps.Ops.OpSHA256();
+    const origHash = hashOp.call(origBytes);
+
+    // Récupérer le hash attendu dans le .ots
+    const expectedHash = detached.fileDigest();
+
+    // Comparer les deux hash
+    const origHex    = Array.from(origHash).map(b => b.toString(16).padStart(2,'0')).join('');
+    const expectedHex = Array.from(expectedHash).map(b => b.toString(16).padStart(2,'0')).join('');
+
+    console.log('Hash fichier original:', origHex);
+    console.log('Hash attendu dans .ots:', expectedHex);
+
+    if (origHex !== expectedHex) {
+      el.innerHTML = '<div style="background:#fdeaea; border:1px solid #e87a7a; border-radius:10px; padding:1rem; font-size:13px;">' +
+        '<div style="font-size:15px; font-weight:600; color:#a32d2d; margin-bottom:6px;">❌ Fichiers non associés</div>' +
+        '<div style="color:#7a2020;">Le fichier original ne correspond pas au fichier .ots fourni. Vérifiez que vous avez sélectionné les bons fichiers.</div>' +
+        '<div style="margin-top:8px; font-size:11px; font-family:monospace; color:#9b2020;">Hash fichier : ' + origHex.substring(0,32) + '…<br>Hash .ots : ' + expectedHex.substring(0,32) + '…</div>' +
+        '</div>';
+      return;
     }
 
-    // VÉRIFICATION RÉELLE avec le fichier original
-    // OpenTimestamps.verify() lève une exception si la vérification échoue
-    // et retourne les attestations si elle réussit
+    // Étape 2 : upgrade — contacte Bitcoin pour récupérer la confirmation
+    el.innerHTML = '<span style="color:var(--muted); font-size:13px;">⏳ Étape 3/3 — Interrogation de la blockchain Bitcoin…</span>';
+    await new Promise(r => setTimeout(r, 100));
+
+    let upgraded = false;
+    try {
+      upgraded = await OpenTimestamps.upgrade(detached);
+      console.log('OTS upgrade:', upgraded ? 'preuve Bitcoin récupérée' : 'pas de mise à jour');
+    } catch(e) {
+      console.log('Upgrade erreur:', e.message);
+    }
+
+    // Étape 3 : vérifier les attestations Bitcoin
     let verifyResult = null;
     try {
       verifyResult = await OpenTimestamps.verify(
@@ -1375,15 +1404,10 @@ async function lancerVerifOtsManuel() {
         new OpenTimestamps.Ops.OpSHA256(),
         origBytes
       );
-      console.log('OTS verify résultat:', verifyResult);
+      console.log('OTS verify:', verifyResult);
     } catch(e) {
-      console.log('OTS verify erreur:', e.message);
-      // Si verify lève une erreur, le fichier original ne correspond pas au .ots
-      el.innerHTML = '<div style="background:#fdeaea; border:1px solid #e87a7a; border-radius:10px; padding:1rem; font-size:13px;">' +
-        '<div style="font-size:15px; font-weight:600; color:#a32d2d; margin-bottom:6px;">❌ Vérification échouée</div>' +
-        '<div style="color:#7a2020;">Le fichier original ne correspond pas au fichier .ots fourni. Ces deux fichiers ne sont pas associés.</div>' +
-        '</div>';
-      return;
+      console.log('OTS verify:', e.message);
+      // verify peut échouer si pending — ce n'est pas une erreur de correspondance
     }
 
     // Si verify réussit, vérifier si Bitcoin a confirmé
