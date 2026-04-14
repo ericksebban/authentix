@@ -772,7 +772,7 @@ td { padding: 0.75rem 1rem; vertical-align: middle; }
   <div class="modal">
     <h2>Détail du certificat <button class="modal-x" onclick="closeModal('modalDetail')">×</button></h2>
     <div id="modalDetailBody"></div>
-    <div id="modalOtsActions" style="display:none; margin-top:1rem; gap:0.6rem; flex-wrap:wrap;">
+    <div id="modalOtsActions" style="display:none; margin-top:1rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
       <button class="btn btn-primary" id="modalDlOtsBtn" style="font-size:12px;">
         ⬇ Télécharger la preuve .ots
       </button>
@@ -1367,12 +1367,12 @@ async function lancerVerifOtsManuel() {
       el.innerHTML = '<div style="background:#e6f9f1; border:1px solid #6dcc8a; border-radius:10px; padding:1rem; font-size:13px;">' +
         '<div style="font-size:15px; font-weight:600; color:#009958; margin-bottom:6px;">✅ Ancrage Bitcoin confirmé</div>' +
         '<div style="color:#2d6648;">' + (block ? 'Inscrit dans le bloc Bitcoin #' + block : 'Confirmé dans la blockchain Bitcoin') + '</div>' +
-        '<div style="margin-top:8px; font-size:12px; color:var(--muted);">Ce certificat prouve l&#39;existence du fichier <strong>' + _verifOrigFile.name + '</strong> à la date d&#39;ancrage.</div>' +
+        '<div style="margin-top:8px; font-size:12px; color:var(--muted);">Ce certificat prouve l'existence du fichier <strong>' + _verifOrigFile.name + '</strong> à la date d'ancrage.</div>' +
         '</div>';
     } else {
       el.innerHTML = '<div style="background:#fff8e0; border:1px solid #e8c84a; border-radius:10px; padding:1rem; font-size:13px;">' +
         '<div style="font-weight:600; color:#7a5c08; margin-bottom:6px;">⏳ Ancrage en attente de confirmation</div>' +
-        '<div style="color:#9b7a20;">La transaction Bitcoin n&#39;est pas encore confirmée. Réessayez dans quelques heures.</div>' +
+        '<div style="color:#9b7a20;">La transaction Bitcoin n'est pas encore confirmée. Réessayez dans quelques heures.</div>' +
         '</div>';
     }
   } catch(e) {
