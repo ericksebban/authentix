@@ -390,8 +390,6 @@ td { padding: 0.75rem 1rem; vertical-align: middle; }
   .packs { grid-template-columns: 1fr 1fr; }
 }
 </style>
-<!-- OpenTimestamps — librairie officielle hébergée localement -->
-<script src="opentimestamps.min.js"></script>
 </head>
 <body>
 
@@ -772,7 +770,7 @@ td { padding: 0.75rem 1rem; vertical-align: middle; }
   <div class="modal">
     <h2>Détail du certificat <button class="modal-x" onclick="closeModal('modalDetail')">×</button></h2>
     <div id="modalDetailBody"></div>
-    <div id="modalOtsActions" style="display:none; margin-top:1rem; display:flex; gap:0.6rem; flex-wrap:wrap;">
+    <div id="modalOtsActions" style="display:none; margin-top:1rem; gap:0.6rem; flex-wrap:wrap;">
       <button class="btn btn-primary" id="modalDlOtsBtn" style="font-size:12px;">
         ⬇ Télécharger la preuve .ots
       </button>
@@ -800,6 +798,16 @@ td { padding: 0.75rem 1rem; vertical-align: middle; }
     <p style="font-size:11px; color:var(--muted); margin-top:0.75rem;">En production : paiement sécurisé via Stripe Checkout.</p>
   </div>
 </div>
+
+<script>
+// Chargement OTS avec gestion d'erreur — ne bloque pas si absent
+(function() {
+  var s = document.createElement('script');
+  s.src = 'opentimestamps.min.js';
+  s.onerror = function() { console.warn('opentimestamps.min.js non chargé'); };
+  document.head.appendChild(s);
+})();
+</script>
 
 <script>
 const SCRIPT = "https://script.google.com/macros/s/AKfycbwCXzXD1foHism5M7HcEHJ_t_akeU4oMM4Y7XoSwxi4skeMhX5CQCJX9e2oPmqjJjac/exec";
@@ -1340,41 +1348,80 @@ async function lancerVerifOtsManuel() {
     const otsBuffer = await _verifOtsFile.arrayBuffer();
     const otsBytes  = new Uint8Array(otsBuffer);
 
-    // Lire le fichier original et calculer son hash
+    // Lire le fichier original
     const origBuffer = await _verifOrigFile.arrayBuffer();
     const origBytes  = new Uint8Array(origBuffer);
 
     // Désérialiser le fichier .ots
     const detached = OpenTimestamps.DetachedTimestampFile.deserialize(otsBytes);
 
-    // Tenter l'upgrade pour obtenir la preuve Bitcoin finale
+    // Tenter l'upgrade (récupère la preuve Bitcoin si disponible)
+    let upgraded = false;
     try {
-      await OpenTimestamps.upgrade(detached);
+      const result = await OpenTimestamps.upgrade(detached);
+      upgraded = result;
+      console.log('OTS upgrade:', upgraded ? 'mis à jour' : 'pas de changement');
     } catch(e) {
-      console.log('Upgrade non disponible:', e.message);
+      console.log('Upgrade:', e.message);
     }
 
-    // Vérifier
+    // VÉRIFICATION RÉELLE avec le fichier original
+    // OpenTimestamps.verify() lève une exception si la vérification échoue
+    // et retourne les attestations si elle réussit
+    let verifyResult = null;
+    try {
+      verifyResult = await OpenTimestamps.verify(
+        detached,
+        new OpenTimestamps.Ops.OpSHA256(),
+        origBytes
+      );
+      console.log('OTS verify résultat:', verifyResult);
+    } catch(e) {
+      console.log('OTS verify erreur:', e.message);
+      // Si verify lève une erreur, le fichier original ne correspond pas au .ots
+      el.innerHTML = '<div style="background:#fdeaea; border:1px solid #e87a7a; border-radius:10px; padding:1rem; font-size:13px;">' +
+        '<div style="font-size:15px; font-weight:600; color:#a32d2d; margin-bottom:6px;">❌ Vérification échouée</div>' +
+        '<div style="color:#7a2020;">Le fichier original ne correspond pas au fichier .ots fourni. Ces deux fichiers ne sont pas associés.</div>' +
+        '</div>';
+      return;
+    }
+
+    // Si verify réussit, vérifier si Bitcoin a confirmé
     const info = OpenTimestamps.info(detached);
     console.log('OTS info:', info);
 
-    const confirmed = info.includes('BitcoinBlockHeaderAttestation') ||
-                      info.includes('height:');
+    const bitcoinConfirmed = info.includes('BitcoinBlockHeaderAttestation') ||
+                             (verifyResult && Object.keys(verifyResult).length > 0);
 
-    if (confirmed) {
-      const blockMatch = info.match(/height:\s*(\d+)/);
-      const block = blockMatch ? blockMatch[1] : null;
+    if (bitcoinConfirmed) {
+      // Extraire le timestamp Bitcoin si disponible
+      let dateConfirm = '';
+      if (verifyResult) {
+        const timestamps = Object.values(verifyResult);
+        if (timestamps.length > 0) {
+          const ts = timestamps[0];
+          if (ts) {
+            const d = new Date(ts * 1000);
+            dateConfirm = d.toLocaleDateString('fr-FR', {
+              year:'numeric', month:'long', day:'numeric',
+              hour:'2-digit', minute:'2-digit'
+            });
+          }
+        }
+      }
       el.innerHTML = '<div style="background:#e6f9f1; border:1px solid #6dcc8a; border-radius:10px; padding:1rem; font-size:13px;">' +
         '<div style="font-size:15px; font-weight:600; color:#009958; margin-bottom:6px;">✅ Ancrage Bitcoin confirmé</div>' +
-        '<div style="color:#2d6648;">' + (block ? 'Inscrit dans le bloc Bitcoin #' + block : 'Confirmé dans la blockchain Bitcoin') + '</div>' +
-        '<div style="margin-top:8px; font-size:12px; color:var(--muted);">Ce certificat prouve l'existence du fichier <strong>' + _verifOrigFile.name + '</strong> à la date d'ancrage.</div>' +
+        '<div style="color:#2d6648;">Le fichier <strong>' + _verifOrigFile.name + '</strong> est bien ancré dans la blockchain Bitcoin.</div>' +
+        (dateConfirm ? '<div style="margin-top:6px; font-size:12px; color:var(--muted);">Date d&#39;ancrage confirmée : ' + dateConfirm + '</div>' : '') +
         '</div>';
     } else {
+      // Vérification OK (fichiers correspondent) mais Bitcoin pas encore confirmé
       el.innerHTML = '<div style="background:#fff8e0; border:1px solid #e8c84a; border-radius:10px; padding:1rem; font-size:13px;">' +
-        '<div style="font-weight:600; color:#7a5c08; margin-bottom:6px;">⏳ Ancrage en attente de confirmation</div>' +
-        '<div style="color:#9b7a20;">La transaction Bitcoin n'est pas encore confirmée. Réessayez dans quelques heures.</div>' +
+        '<div style="font-weight:600; color:#7a5c08; margin-bottom:6px;">⏳ Fichiers correspondants — ancrage en attente</div>' +
+        '<div style="color:#9b7a20;">Le fichier original correspond bien au fichier .ots. La confirmation Bitcoin est en attente (généralement 6 à 24h).</div>' +
         '</div>';
     }
+
   } catch(e) {
     el.innerHTML = '<div style="background:#fdeaea; border:1px solid #e87a7a; border-radius:10px; padding:1rem; font-size:13px;">' +
       '<strong style="color:#a32d2d;">Erreur de vérification</strong><br>' +
