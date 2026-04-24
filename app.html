@@ -1348,10 +1348,32 @@ async function lancerVerifBitcoin(otsB64, certId) {
       '<span style="color:#2d6648;">' + result.message + '</span>' +
       (result.block ? '<br><span style="font-size:11px; color:var(--muted);">Bloc #' + result.block + '</span>' : '') +
       '</div>';
-    // Mettre à jour le .ots upgradé si disponible
-    if (result.upgradedB64) {
-      console.log('OTS upgradé disponible — mise à jour du stockage local');
+
+    // ── Mise à jour du coffre-fort local + Google Sheets ──
+    if (certId && typeof allCerts !== 'undefined') {
+      const certToUpdate = allCerts.find(c =>
+        (c.ID_CERTIFICAT || c.certId || '') === certId
+      );
+      if (certToUpdate) {
+        certToUpdate.OTS_STATUS = 'confirmed';
+        saveLocalCerts(allCerts);
+        renderCerts();
+        console.log('Coffre-fort mis à jour depuis modale : confirmed pour', certId);
+
+        // Mettre à jour Google Sheets en arrière-plan
+        fetch(SCRIPT, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'updateOtsStatus',
+            certId: certId,
+            status: 'confirmed'
+          })
+        }).then(r => r.json())
+          .then(d => console.log('Sheet mis à jour:', d.ok ? 'OK' : d.error))
+          .catch(e => console.log('Sheet update:', e.message));
+      }
     }
+
   } else {
     el.innerHTML = '<div style="background:#fff8e0; border:1px solid #e8c84a; border-radius:8px; padding:0.85rem; font-size:13px;">' +
       '<strong style="color:#7a5c08;">⏳ ' + result.message + '</strong><br>' +
